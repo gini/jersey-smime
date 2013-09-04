@@ -1,7 +1,7 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
-import org.jboss.resteasy.util.Types;
+import com.github.joschi.jersey.util.Types;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;

@@ -4,7 +4,6 @@ import com.github.joschi.jersey.security.BouncyIntegration;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
-import org.jboss.resteasy.spi.WriterException;
 
 import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Produces;
@@ -57,7 +56,7 @@ public class SignedWriter implements MessageBodyWriter<SignedOutput> {
             headers.putSingle("Content-Type", contentType);
             mp.writeTo(os);
         } catch (Exception e) {
-            throw new WriterException(e);
+            throw new RuntimeException(e);
         }
     }
 }

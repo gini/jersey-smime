@@ -1,7 +1,7 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
-import com.sun.jersey.core.util.Base64;
+import com.github.joschi.jersey.util.Base64;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
@@ -79,8 +79,8 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
             _msg.writeTo(encrypted);
             encrypted.close();
             byte[] bytes = baos.toByteArray();
-            byte[] base64 = Base64.encode(bytes);
-            os.write(base64);
+            String str = Base64.encodeBytes(bytes, Base64.DO_BREAK_LINES);
+            os.write(str.getBytes());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,9 +1,9 @@
 package com.github.joschi.jersey.security.smime;
 
+import com.github.joschi.jersey.util.GenericType;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.mail.smime.SMIMESigned;
-import org.jboss.resteasy.util.GenericType;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;

@@ -1,12 +1,12 @@
 package com.github.joschi.jersey.security.smime;
 
+import com.github.joschi.jersey.util.GenericType;
 import com.sun.jersey.core.header.InBoundHeaders;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.bouncycastle.mail.smime.SMIMEEnveloped;
 import org.bouncycastle.mail.smime.SMIMEUtil;
-import org.jboss.resteasy.util.GenericType;
 
 import javax.mail.Header;
 import javax.mail.MessagingException;

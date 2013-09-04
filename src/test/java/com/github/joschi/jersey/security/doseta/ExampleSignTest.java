@@ -25,66 +25,62 @@ import java.security.spec.X509EncodedKeySpec;
 //import java.security.KeyPairGenerator;
 //import java.security.MessageDigest;
 
-public class ExampleSignTest
-{
+public class ExampleSignTest {
 
-   public static PrivateKey getPrivate(InputStream is)
-           throws Exception
-   {
+    public static PrivateKey getPrivate(InputStream is)
+            throws Exception {
 
-      DataInputStream dis = new DataInputStream(is);
-      byte[] keyBytes = new byte[dis.available()];
-      dis.readFully(keyBytes);
-      dis.close();
+        DataInputStream dis = new DataInputStream(is);
+        byte[] keyBytes = new byte[dis.available()];
+        dis.readFully(keyBytes);
+        dis.close();
 
-      PKCS8EncodedKeySpec spec =
-              new PKCS8EncodedKeySpec(keyBytes);
-      KeyFactory kf = KeyFactory.getInstance("RSA");
-      return kf.generatePrivate(spec);
-   }
+        PKCS8EncodedKeySpec spec =
+                new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(spec);
+    }
 
 
-   public PublicKey getPublic(InputStream is) throws Exception
-   {
-      DataInputStream dis = new DataInputStream(is);
-      byte[] pemFile = new byte[dis.available()];
-      dis.readFully(pemFile);
-      String pem = new String(pemFile);
-      pem = pem.replace("-----BEGIN PUBLIC KEY-----", "");
-      pem = pem.replace("-----END PUBLIC KEY-----", "");
-      pem = pem.trim();
-      //System.out.println(pem);
+    public PublicKey getPublic(InputStream is) throws Exception {
+        DataInputStream dis = new DataInputStream(is);
+        byte[] pemFile = new byte[dis.available()];
+        dis.readFully(pemFile);
+        String pem = new String(pemFile);
+        pem = pem.replace("-----BEGIN PUBLIC KEY-----", "");
+        pem = pem.replace("-----END PUBLIC KEY-----", "");
+        pem = pem.trim();
+        //System.out.println(pem);
 
-      byte[] der = Base64.decode(pem);
-
-
-      X509EncodedKeySpec spec =
-              new X509EncodedKeySpec(der);
-      KeyFactory kf = KeyFactory.getInstance("RSA");
-      return kf.generatePublic(spec);
-   }
-
-   @Test
-   public void testPemFiles() throws Exception
-   {
-      InputStream publicIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("public_dkim_key.pem");
-      InputStream privateIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("private_dkim_key.der");
-
-      PublicKey publicKey = getPublic(publicIs);
-      PrivateKey privateKey = getPrivate(privateIs);
-
-      Signature instance = Signature.getInstance("SHA256withRSA");
-      instance.initSign(privateKey);
-      instance.update("from-java".getBytes());
-      byte[] signatureBytes = instance.sign();
+        byte[] der = Base64.decode(pem);
 
 
-      Signature verify = Signature.getInstance("SHA256withRSA");
-      verify.initVerify(publicKey);
-      verify.update("from-java".getBytes());
-      Assert.assertTrue(verify.verify(signatureBytes));
+        X509EncodedKeySpec spec =
+                new X509EncodedKeySpec(der);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(spec);
+    }
 
-   }
+    @Test
+    public void testPemFiles() throws Exception {
+        InputStream publicIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("public_dkim_key.pem");
+        InputStream privateIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("private_dkim_key.der");
+
+        PublicKey publicKey = getPublic(publicIs);
+        PrivateKey privateKey = getPrivate(privateIs);
+
+        Signature instance = Signature.getInstance("SHA256withRSA");
+        instance.initSign(privateKey);
+        instance.update("from-java".getBytes());
+        byte[] signatureBytes = instance.sign();
+
+
+        Signature verify = Signature.getInstance("SHA256withRSA");
+        verify.initVerify(publicKey);
+        verify.update("from-java".getBytes());
+        Assert.assertTrue(verify.verify(signatureBytes));
+
+    }
 
 
    /*

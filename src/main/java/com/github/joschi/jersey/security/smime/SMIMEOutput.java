@@ -10,86 +10,71 @@ import java.security.cert.X509Certificate;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SMIMEOutput
-{
-   protected Object entity;
-   protected Type genericType;
-   protected Class type;
-   protected MediaType mediaType;
-   protected X509Certificate certificate;
+public class SMIMEOutput {
+    protected Object entity;
+    protected Type genericType;
+    protected Class type;
+    protected MediaType mediaType;
+    protected X509Certificate certificate;
 
-   public SMIMEOutput(Object obj, String mediaType)
-   {
-      this.entity = obj;
-      this.type = obj.getClass();
-      setMediaType(mediaType);
-   }
+    public SMIMEOutput(Object obj, String mediaType) {
+        this.entity = obj;
+        this.type = obj.getClass();
+        setMediaType(mediaType);
+    }
 
-   public SMIMEOutput(Object obj, MediaType mediaType)
-   {
-      this.entity = obj;
-      this.type = obj.getClass();
-      this.mediaType = mediaType;
-   }
+    public SMIMEOutput(Object obj, MediaType mediaType) {
+        this.entity = obj;
+        this.type = obj.getClass();
+        this.mediaType = mediaType;
+    }
 
-   public Object getEntity()
-   {
-      return entity;
-   }
+    public Object getEntity() {
+        return entity;
+    }
 
-   public void setEntity(Object entity)
-   {
-      this.entity = entity;
-   }
+    public void setEntity(Object entity) {
+        this.entity = entity;
+    }
 
-   public Type getGenericType()
-   {
-      return genericType;
-   }
+    public Type getGenericType() {
+        return genericType;
+    }
 
-   public void setGenericType(Type genericType)
-   {
-      this.genericType = genericType;
-   }
+    public void setGenericType(Type genericType) {
+        this.genericType = genericType;
+    }
 
-   public Class getType()
-   {
-      return type;
-   }
+    public Class getType() {
+        return type;
+    }
 
-   public void setType(Class type)
-   {
-      this.type = type;
-   }
+    public void setType(Class type) {
+        this.type = type;
+    }
 
-   public void setType(GenericType t)
-   {
-      type = t.getType();
-      genericType = t.getGenericType();
-   }
+    public void setType(GenericType t) {
+        type = t.getType();
+        genericType = t.getGenericType();
+    }
 
-   public MediaType getMediaType()
-   {
-      return mediaType;
-   }
+    public MediaType getMediaType() {
+        return mediaType;
+    }
 
-   public void setMediaType(MediaType mediaType)
-   {
-      this.mediaType = mediaType;
-   }
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
+    }
 
-   public void setMediaType(String mediaType)
-   {
-      this.mediaType = MediaType.valueOf(mediaType);
-   }
+    public void setMediaType(String mediaType) {
+        this.mediaType = MediaType.valueOf(mediaType);
+    }
 
-   public X509Certificate getCertificate()
-   {
-      return certificate;
-   }
+    public X509Certificate getCertificate() {
+        return certificate;
+    }
 
-   public void setCertificate(X509Certificate certificate)
-   {
-      this.certificate = certificate;
-   }
+    public void setCertificate(X509Certificate certificate) {
+        this.certificate = certificate;
+    }
 }

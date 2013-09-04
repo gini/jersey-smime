@@ -26,46 +26,38 @@ import java.lang.reflect.Type;
  */
 @Provider
 @Produces("*/*")
-public class SignedWriter implements MessageBodyWriter<SignedOutput>
-{
-   static
-   {
-      BouncyIntegration.init();
-   }
+public class SignedWriter implements MessageBodyWriter<SignedOutput> {
+    static {
+        BouncyIntegration.init();
+    }
 
-   @Context
-   protected Providers providers;
+    @Context
+    protected Providers providers;
 
-   @Override
-   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)
-   {
-      return SignedOutput.class.isAssignableFrom(type);
-   }
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return SignedOutput.class.isAssignableFrom(type);
+    }
 
-   @Override
-   public long getSize(SignedOutput smimeOutput, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)
-   {
-      return -1;
-   }
+    @Override
+    public long getSize(SignedOutput smimeOutput, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return -1;
+    }
 
-   @Override
-   public void writeTo(SignedOutput out, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException, WebApplicationException
-   {
-      try
-      {
-         SMIMESignedGenerator gen = new SMIMESignedGenerator();
-         SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", out.getPrivateKey(), out.getCertificate());
-         gen.addSignerInfoGenerator(signer);
+    @Override
+    public void writeTo(SignedOutput out, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException, WebApplicationException {
+        try {
+            SMIMESignedGenerator gen = new SMIMESignedGenerator();
+            SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", out.getPrivateKey(), out.getCertificate());
+            gen.addSignerInfoGenerator(signer);
 
-         MimeMultipart mp = gen.generate(EnvelopedWriter.createBodyPart(providers, out));
-         String contentType = mp.getContentType();
-         contentType = contentType.replace("\r\n", "").replace("\t", " ");
-         headers.putSingle("Content-Type", contentType);
-         mp.writeTo(os);
-      }
-      catch (Exception e)
-      {
-         throw new WriterException(e);
-      }
-   }
+            MimeMultipart mp = gen.generate(EnvelopedWriter.createBodyPart(providers, out));
+            String contentType = mp.getContentType();
+            contentType = contentType.replace("\r\n", "").replace("\t", " ");
+            headers.putSingle("Content-Type", contentType);
+            mp.writeTo(os);
+        } catch (Exception e) {
+            throw new WriterException(e);
+        }
+    }
 }

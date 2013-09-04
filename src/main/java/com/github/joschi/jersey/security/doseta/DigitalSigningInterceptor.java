@@ -34,135 +34,109 @@ import java.util.List;
 @ServerInterceptor
 @ClientInterceptor
 @DecoderPrecedence
-public class DigitalSigningInterceptor implements MessageBodyWriterInterceptor, ClientExecutionInterceptor, PostProcessInterceptor
-{
+public class DigitalSigningInterceptor implements MessageBodyWriterInterceptor, ClientExecutionInterceptor, PostProcessInterceptor {
 
-   protected List<DKIMSignature> getHeaders(MultivaluedMap<String, Object> headers)
-   {
-      List<DKIMSignature> list = new ArrayList<DKIMSignature>();
+    protected List<DKIMSignature> getHeaders(MultivaluedMap<String, Object> headers) {
+        List<DKIMSignature> list = new ArrayList<DKIMSignature>();
 
-      List<Object> signatures = headers.get(DKIMSignature.DKIM_SIGNATURE);
-      if (signatures == null || signatures.isEmpty())
-      {
-         return list;
-      }
+        List<Object> signatures = headers.get(DKIMSignature.DKIM_SIGNATURE);
+        if (signatures == null || signatures.isEmpty()) {
+            return list;
+        }
 
-      for (Object obj : signatures)
-      {
-         if (obj instanceof DKIMSignature)
-         {
-            list.add((DKIMSignature) obj);
-         }
-      }
-      return list;
-   }
+        for (Object obj : signatures) {
+            if (obj instanceof DKIMSignature) {
+                list.add((DKIMSignature) obj);
+            }
+        }
+        return list;
+    }
 
-   @Override
-   public ClientResponse execute(ClientExecutionContext context) throws Exception
-   {
-      if (context.getRequest().getBody() != null)
-      {
-         return context.proceed(); // let the MBW handle this
-      }
+    @Override
+    public ClientResponse execute(ClientExecutionContext context) throws Exception {
+        if (context.getRequest().getBody() != null) {
+            return context.proceed(); // let the MBW handle this
+        }
 
-      MultivaluedMap<String, Object> headers = context.getRequest().getHeadersAsObjects();
-      List<DKIMSignature> list = getHeaders(headers);
+        MultivaluedMap<String, Object> headers = context.getRequest().getHeadersAsObjects();
+        List<DKIMSignature> list = getHeaders(headers);
 
-      for (DKIMSignature dosetaSignature : list)
-      {
-         KeyRepository repository = (KeyRepository) context.getRequest().getAttributes().get(KeyRepository.class.getName());
-         sign(repository, headers, null, dosetaSignature);
-      }
+        for (DKIMSignature dosetaSignature : list) {
+            KeyRepository repository = (KeyRepository) context.getRequest().getAttributes().get(KeyRepository.class.getName());
+            sign(repository, headers, null, dosetaSignature);
+        }
 
-      return context.proceed();
-   }
+        return context.proceed();
+    }
 
-   @Override
-   public void postProcess(ServerResponse response)
-   {
-      if (response.getEntity() != null)
-      {
-         return;  // let the MBW handle this
-      }
+    @Override
+    public void postProcess(ServerResponse response) {
+        if (response.getEntity() != null) {
+            return;  // let the MBW handle this
+        }
 
-      MultivaluedMap<String, Object> headers = response.getMetadata();
-      List<DKIMSignature> list = getHeaders(headers);
+        MultivaluedMap<String, Object> headers = response.getMetadata();
+        List<DKIMSignature> list = getHeaders(headers);
 
-      for (DKIMSignature dosetaSignature : list)
-      {
-         try
-         {
-            sign(null, headers, null, dosetaSignature);
-         }
-         catch (Exception e)
-         {
-            throw new RuntimeException(e);
-         }
-      }
-   }
+        for (DKIMSignature dosetaSignature : list) {
+            try {
+                sign(null, headers, null, dosetaSignature);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
-   public void write(MessageBodyWriterContext context) throws IOException, WebApplicationException
-   {
-      MultivaluedMap<String, Object> headers = context.getHeaders();
+    public void write(MessageBodyWriterContext context) throws IOException, WebApplicationException {
+        MultivaluedMap<String, Object> headers = context.getHeaders();
 
-      List<DKIMSignature> list = getHeaders(headers);
+        List<DKIMSignature> list = getHeaders(headers);
 
-      if (list.isEmpty())
-      {
-         context.proceed();
-         return;
-      }
+        if (list.isEmpty()) {
+            context.proceed();
+            return;
+        }
 
-      //System.out.println("TRACE: Found ContentSignatures");
-      OutputStream old = context.getOutputStream();
-      try
-      {
-         // store body in a byte array so we can use it to calculate signature
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         context.setOutputStream(baos);
-         context.proceed();
-         byte[] body = baos.toByteArray();
+        //System.out.println("TRACE: Found ContentSignatures");
+        OutputStream old = context.getOutputStream();
+        try {
+            // store body in a byte array so we can use it to calculate signature
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            context.setOutputStream(baos);
+            context.proceed();
+            byte[] body = baos.toByteArray();
 
-         for (DKIMSignature dosetaSignature : list)
-         {
-            KeyRepository repository = (KeyRepository) context.getAttribute(KeyRepository.class.getName());
-            sign(repository, headers, body, dosetaSignature);
-         }
+            for (DKIMSignature dosetaSignature : list) {
+                KeyRepository repository = (KeyRepository) context.getAttribute(KeyRepository.class.getName());
+                sign(repository, headers, body, dosetaSignature);
+            }
 
-         old.write(body);
-      }
-      catch (Exception e)
-      {
-         throw new RuntimeException("Failed to sign", e);
-      }
-      finally
-      {
-         context.setOutputStream(old);
-      }
-   }
+            old.write(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to sign", e);
+        } finally {
+            context.setOutputStream(old);
+        }
+    }
 
-   protected void sign(KeyRepository repository, MultivaluedMap<String, Object> headers, byte[] body, DKIMSignature dosetaSignature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, UnsupportedEncodingException
-   {
-      // if its already signed, don't bother
-      if (dosetaSignature.getBased64Signature() != null) return;
+    protected void sign(KeyRepository repository, MultivaluedMap<String, Object> headers, byte[] body, DKIMSignature dosetaSignature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, UnsupportedEncodingException {
+        // if its already signed, don't bother
+        if (dosetaSignature.getBased64Signature() != null) return;
 
-      PrivateKey privateKey = dosetaSignature.getPrivateKey();
-      if (privateKey == null)
-      {
-         if (repository == null) repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
+        PrivateKey privateKey = dosetaSignature.getPrivateKey();
+        if (privateKey == null) {
+            if (repository == null) repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
 
-         if (repository == null)
-         {
-            throw new RuntimeException("Unable to locate a private key to sign message, repository is null.");
+            if (repository == null) {
+                throw new RuntimeException("Unable to locate a private key to sign message, repository is null.");
 
-         }
+            }
 
-         privateKey = repository.findPrivateKey(dosetaSignature);
-         if (privateKey == null)
-         {
-            throw new RuntimeException("Unable to find key to sign message. Repository returned null. ");
-         }
-      }
-      dosetaSignature.sign(headers, body, privateKey);
-   }
+            privateKey = repository.findPrivateKey(dosetaSignature);
+            if (privateKey == null) {
+                throw new RuntimeException("Unable to find key to sign message. Repository returned null. ");
+            }
+        }
+        dosetaSignature.sign(headers, body, privateKey);
+    }
 }

@@ -24,66 +24,52 @@ import java.util.List;
 @ClientInterceptor
 @ServerInterceptor
 @DecoderPrecedence
-public class DigitalVerificationInterceptor implements MessageBodyReaderInterceptor
-{
-   @Override
-   public Object read(MessageBodyReaderContext context) throws IOException, WebApplicationException
-   {
-      Verifier verifier = (Verifier) context.getAttribute(Verifier.class.getName());
-      if (verifier == null)
-      {
-         return context.proceed();
-      }
+public class DigitalVerificationInterceptor implements MessageBodyReaderInterceptor {
+    @Override
+    public Object read(MessageBodyReaderContext context) throws IOException, WebApplicationException {
+        Verifier verifier = (Verifier) context.getAttribute(Verifier.class.getName());
+        if (verifier == null) {
+            return context.proceed();
+        }
 
-      //System.out.println("TRACE: found verifier");
+        //System.out.println("TRACE: found verifier");
 
-      MultivaluedMap<String, String> headers = context.getHeaders();
-      List<String> strings = headers.get(DKIMSignature.DKIM_SIGNATURE);
-      if (strings == null)
-      {
-         throw new UnauthorizedSignatureException("There was no " + DKIMSignature.DKIM_SIGNATURE + " header");
-      }
-      List<DKIMSignature> signatures = new ArrayList<DKIMSignature>();
-      for (String headerVal : strings)
-      {
-         try
-         {
-            signatures.add(new DKIMSignature(headerVal));
-         }
-         catch (Exception e)
-         {
-            throw new UnauthorizedSignatureException("Malformed " + DKIMSignature.DKIM_SIGNATURE + " header");
-         }
-      }
-
-      InputStream old = context.getInputStream();
-      try
-      {
-         InputStreamToByteArray stream = new InputStreamToByteArray(old);
-         context.setInputStream(stream);
-         Object rtn = context.proceed();
-         byte[] body = stream.toByteArray();
-
-         if (verifier.getRepository() == null)
-         {
-            KeyRepository repository = (KeyRepository) context.getAttribute(KeyRepository.class.getName());
-            if (repository == null)
-            {
-               repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
+        MultivaluedMap<String, String> headers = context.getHeaders();
+        List<String> strings = headers.get(DKIMSignature.DKIM_SIGNATURE);
+        if (strings == null) {
+            throw new UnauthorizedSignatureException("There was no " + DKIMSignature.DKIM_SIGNATURE + " header");
+        }
+        List<DKIMSignature> signatures = new ArrayList<DKIMSignature>();
+        for (String headerVal : strings) {
+            try {
+                signatures.add(new DKIMSignature(headerVal));
+            } catch (Exception e) {
+                throw new UnauthorizedSignatureException("Malformed " + DKIMSignature.DKIM_SIGNATURE + " header");
             }
-            verifier.setRepository(repository);
-         }
+        }
 
-         VerificationResults results = verifier.verify(signatures, headers, body);
-         if (results.isVerified() == false)
-         {
-            throw new UnauthorizedSignatureException(results);
-         }
-         return rtn;
-      }
-      finally
-      {
-         context.setInputStream(old);
-      }
-   }
+        InputStream old = context.getInputStream();
+        try {
+            InputStreamToByteArray stream = new InputStreamToByteArray(old);
+            context.setInputStream(stream);
+            Object rtn = context.proceed();
+            byte[] body = stream.toByteArray();
+
+            if (verifier.getRepository() == null) {
+                KeyRepository repository = (KeyRepository) context.getAttribute(KeyRepository.class.getName());
+                if (repository == null) {
+                    repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
+                }
+                verifier.setRepository(repository);
+            }
+
+            VerificationResults results = verifier.verify(signatures, headers, body);
+            if (results.isVerified() == false) {
+                throw new UnauthorizedSignatureException(results);
+            }
+            return rtn;
+        } finally {
+            context.setInputStream(old);
+        }
+    }
 }

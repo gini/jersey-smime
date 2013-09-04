@@ -13,15 +13,13 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 @HeaderDecoratorPrecedence
-public class ServerDigitalSigningHeaderDecorator extends DigitalSigningHeaderDecorator implements PostProcessInterceptor
-{
+public class ServerDigitalSigningHeaderDecorator extends DigitalSigningHeaderDecorator implements PostProcessInterceptor {
 
-   @Override
-   public void postProcess(ServerResponse response)
-   {
-      KeyRepository repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
-      DKIMSignature header = createHeader(repository);
-      response.getMetadata().add(DKIMSignature.DKIM_SIGNATURE, header);
-   }
+    @Override
+    public void postProcess(ServerResponse response) {
+        KeyRepository repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
+        DKIMSignature header = createHeader(repository);
+        response.getMetadata().add(DKIMSignature.DKIM_SIGNATURE, header);
+    }
 
 }

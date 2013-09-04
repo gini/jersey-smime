@@ -14,20 +14,17 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 @HeaderDecoratorPrecedence
-public class ClientDigitalSigningHeaderDecorator extends DigitalSigningHeaderDecorator implements ClientExecutionInterceptor
-{
+public class ClientDigitalSigningHeaderDecorator extends DigitalSigningHeaderDecorator implements ClientExecutionInterceptor {
 
-   @Override
-   public ClientResponse execute(ClientExecutionContext ctx) throws Exception
-   {
-      KeyRepository repository = (KeyRepository) ctx.getRequest().getAttributes().get(KeyRepository.class.getName());
-      if (repository == null)
-      {
-         repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
-      }
-      DKIMSignature header = createHeader(repository);
-      ctx.getRequest().header(DKIMSignature.DKIM_SIGNATURE, header);
-      return ctx.proceed();
-   }
+    @Override
+    public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
+        KeyRepository repository = (KeyRepository) ctx.getRequest().getAttributes().get(KeyRepository.class.getName());
+        if (repository == null) {
+            repository = ResteasyProviderFactory.getContextData(KeyRepository.class);
+        }
+        DKIMSignature header = createHeader(repository);
+        ctx.getRequest().header(DKIMSignature.DKIM_SIGNATURE, header);
+        return ctx.proceed();
+    }
 
 }

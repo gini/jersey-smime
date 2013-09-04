@@ -16,27 +16,24 @@ import java.util.Date;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class KeyTools
-{
-   static
-   {
-      BouncyIntegration.init();
-   }
+public class KeyTools {
+    static {
+        BouncyIntegration.init();
+    }
 
-   public static X509Certificate generateTestCertificate(KeyPair pair) throws InvalidKeyException,
-           NoSuchProviderException, SignatureException
-   {
+    public static X509Certificate generateTestCertificate(KeyPair pair) throws InvalidKeyException,
+            NoSuchProviderException, SignatureException {
 
-      X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
+        X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
 
-      certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
-      certGen.setIssuerDN(new X500Principal("CN=Test Certificate"));
-      certGen.setNotBefore(new Date(System.currentTimeMillis() - 10000));
-      certGen.setNotAfter(new Date(System.currentTimeMillis() + 10000));
-      certGen.setSubjectDN(new X500Principal("CN=Test Certificate"));
-      certGen.setPublicKey(pair.getPublic());
-      certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
+        certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
+        certGen.setIssuerDN(new X500Principal("CN=Test Certificate"));
+        certGen.setNotBefore(new Date(System.currentTimeMillis() - 10000));
+        certGen.setNotAfter(new Date(System.currentTimeMillis() + 10000));
+        certGen.setSubjectDN(new X500Principal("CN=Test Certificate"));
+        certGen.setPublicKey(pair.getPublic());
+        certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
 
-      return certGen.generateX509Certificate(pair.getPrivate(), "BC");
-   }
+        return certGen.generateX509Certificate(pair.getPrivate(), "BC");
+    }
 }

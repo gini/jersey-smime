@@ -31,87 +31,79 @@ import java.security.cert.X509Certificate;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SignedTest
-{
+public class SignedTest {
 
-   private static X509Certificate cert;
-   private static PrivateKey privateKey;
-   private static PrivateKey badKey;
+    private static X509Certificate cert;
+    private static PrivateKey privateKey;
+    private static PrivateKey badKey;
 
-   @BeforeClass
-   public static void setup() throws Exception
-   {
-      Security.addProvider(new BouncyCastleProvider());
-      InputStream certIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("mycert.pem");
-      cert = PemUtils.decodeCertificate(certIs);
+    @BeforeClass
+    public static void setup() throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+        InputStream certIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("mycert.pem");
+        cert = PemUtils.decodeCertificate(certIs);
 
-      InputStream privateIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("mycert-private.pem");
-      privateKey = PemUtils.decodePrivateKey(privateIs);
+        InputStream privateIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("mycert-private.pem");
+        privateKey = PemUtils.decodePrivateKey(privateIs);
 
-      InputStream badIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("private_dkim_key.der");
-      badKey = DerUtils.decodePrivateKey(badIs);
-   }
+        InputStream badIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("private_dkim_key.der");
+        badKey = DerUtils.decodePrivateKey(badIs);
+    }
 
-   private MimeBodyPart createMsg() throws MessagingException
-   {
-      InternetHeaders ih = new InternetHeaders();
-      ih.addHeader("Content-Type", "application/xml");
+    private MimeBodyPart createMsg() throws MessagingException {
+        InternetHeaders ih = new InternetHeaders();
+        ih.addHeader("Content-Type", "application/xml");
 
-      return new MimeBodyPart(ih, "<customer name=\"bill\"/>".getBytes());
-   }
+        return new MimeBodyPart(ih, "<customer name=\"bill\"/>".getBytes());
+    }
 
-   private void output(MimeBodyPart mp) throws IOException, MessagingException
-   {
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mp.writeTo(os);
-      String s = new String(os.toByteArray());
-      System.out.println(s);
-   }
+    private void output(MimeBodyPart mp) throws IOException, MessagingException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mp.writeTo(os);
+        String s = new String(os.toByteArray());
+        System.out.println(s);
+    }
 
-   private void output(MimeMultipart mp) throws IOException, MessagingException
-   {
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mp.writeTo(os);
-      String s = new String(os.toByteArray());
-      System.out.println(s);
-   }
+    private void output(MimeMultipart mp) throws IOException, MessagingException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mp.writeTo(os);
+        String s = new String(os.toByteArray());
+        System.out.println(s);
+    }
 
-   @Test
-   public void testMultipart() throws Exception
-   {
-      MimeMultipart mp = new MimeMultipart();
-      InternetHeaders ih = new InternetHeaders();
-      ih.addHeader("Content-Type", "text/xml");
-      MimeBodyPart bp = new MimeBodyPart(ih, "<customer/>".getBytes());
-      mp.addBodyPart(bp);
+    @Test
+    public void testMultipart() throws Exception {
+        MimeMultipart mp = new MimeMultipart();
+        InternetHeaders ih = new InternetHeaders();
+        ih.addHeader("Content-Type", "text/xml");
+        MimeBodyPart bp = new MimeBodyPart(ih, "<customer/>".getBytes());
+        mp.addBodyPart(bp);
 
-      bp = new MimeBodyPart(ih, "<product/>".getBytes());
-      mp.addBodyPart(bp);
+        bp = new MimeBodyPart(ih, "<product/>".getBytes());
+        mp.addBodyPart(bp);
 
 
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mp.writeTo(os);
+        String s = new String(os.toByteArray());
 
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mp.writeTo(os);
-      String s = new String(os.toByteArray());
+        System.out.println(s);
+        System.out.println("************");
 
-      System.out.println(s);
-      System.out.println("************");
+        String contentType = mp.getContentType();
+        contentType = contentType.replace("\r\n", "").replace("\t", " ");
+        System.out.println("Content-Type: " + contentType);
 
-      String contentType = mp.getContentType();
-      contentType = contentType.replace("\r\n", "").replace("\t", " ");
-      System.out.println("Content-Type: " + contentType);
-
-      mp = new MimeMultipart(new ByteArrayDataSource(s.getBytes(), "multipart/signed"));
-      System.out.println("count: " + mp.getCount());
-
-
-   }
+        mp = new MimeMultipart(new ByteArrayDataSource(s.getBytes(), "multipart/signed"));
+        System.out.println("count: " + mp.getCount());
 
 
-   @Test
-   public void testPythonSigned() throws Exception
-   {
-      final InputStream pythonIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("python_signed.txt");
+    }
+
+
+    @Test
+    public void testPythonSigned() throws Exception {
+        final InputStream pythonIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("python_signed.txt");
 
       /*
       Message message = new Message(pythonIs);
@@ -119,112 +111,106 @@ public class SignedTest
       System.out.println("count: " + multipart.getCount());
       */
 
-      ByteArrayDataSource ds = new ByteArrayDataSource(pythonIs, "multipart/signed");
-      MimeMultipart mm = new MimeMultipart(ds);
+        ByteArrayDataSource ds = new ByteArrayDataSource(pythonIs, "multipart/signed");
+        MimeMultipart mm = new MimeMultipart(ds);
 
-      System.out.println(mm.getContentType());
+        System.out.println(mm.getContentType());
 
-      System.out.println("Multipart.count(): " + mm.getCount());
+        System.out.println("Multipart.count(): " + mm.getCount());
 
-      MimeBodyPart mbp = (MimeBodyPart) mm.getBodyPart(0);
+        MimeBodyPart mbp = (MimeBodyPart) mm.getBodyPart(0);
 
-      output(mbp);
+        output(mbp);
 
-      SMIMESigned signed = new SMIMESigned(mm);
+        SMIMESigned signed = new SMIMESigned(mm);
 
-      SignerInformationStore signers = signed.getSignerInfos();
-      Assert.assertEquals(1, signers.size());
-      SignerInformation signer = (SignerInformation) signers.getSigners().iterator().next();
-      Assert.assertTrue(signer.verify(cert.getPublicKey(), "BC"));
-   }
+        SignerInformationStore signers = signed.getSignerInfos();
+        Assert.assertEquals(1, signers.size());
+        SignerInformation signer = (SignerInformation) signers.getSigners().iterator().next();
+        Assert.assertTrue(signer.verify(cert.getPublicKey(), "BC"));
+    }
 
-   @Test
-   public void testOutput() throws Exception
-   {
-      SMIMESignedGenerator gen = new SMIMESignedGenerator();
-      SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", privateKey, cert);
-      gen.addSignerInfoGenerator(signer);
+    @Test
+    public void testOutput() throws Exception {
+        SMIMESignedGenerator gen = new SMIMESignedGenerator();
+        SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", privateKey, cert);
+        gen.addSignerInfoGenerator(signer);
 
-      MimeMultipart mp = gen.generate(createMsg());
+        MimeMultipart mp = gen.generate(createMsg());
 
-      output(mp);
+        output(mp);
 
-   }
+    }
 
-   @Test
-   public void testOutput2() throws Exception
-   {
-      SMIMESignedGenerator gen = new SMIMESignedGenerator();
-      SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", privateKey, cert);
-      gen.addSignerInfoGenerator(signer);
+    @Test
+    public void testOutput2() throws Exception {
+        SMIMESignedGenerator gen = new SMIMESignedGenerator();
+        SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", privateKey, cert);
+        gen.addSignerInfoGenerator(signer);
 
-      MimeMultipart mp = gen.generate(createMsg());
+        MimeMultipart mp = gen.generate(createMsg());
 
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mp.writeTo(os);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mp.writeTo(os);
 
-      ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-      String contentType = mp.getContentType();
-      contentType = contentType.replace("\r\n", "").replace("\t", " ");
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        String contentType = mp.getContentType();
+        contentType = contentType.replace("\r\n", "").replace("\t", " ");
 
-      ByteArrayDataSource ds = new ByteArrayDataSource(is, contentType);
-      MimeMultipart mm = new MimeMultipart(ds);
-      MimeBodyPart part = (MimeBodyPart)mm.getBodyPart(0);
+        ByteArrayDataSource ds = new ByteArrayDataSource(is, contentType);
+        MimeMultipart mm = new MimeMultipart(ds);
+        MimeBodyPart part = (MimeBodyPart) mm.getBodyPart(0);
 
 
+    }
+
+    @Test
+    public void testPythonVerified() throws Exception {
+        SMIMESignedGenerator gen = new SMIMESignedGenerator();
+        SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", privateKey, cert);
+        gen.addSignerInfoGenerator(signer);
+
+        MimeMultipart mp = gen.generate(createMsg());
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mp.writeTo(os);
+        String contentType = mp.getContentType();
+        contentType = contentType.replace("\r\n", "").replace("\t", " ");
+        System.out.println(contentType);
+        String s = new String(os.toByteArray());
+        StringBuilder builder = new StringBuilder();
+        builder.append("Content-Type: ").append(contentType).append("\r\n\r\n").append(s);
+        String output = builder.toString();
+
+        FileOutputStream fp = new FileOutputStream("smime_signed.txt");
+        fp.write(output.getBytes());
+        fp.close();
 
 
-   }
+    }
 
-   @Test
-   public void testPythonVerified() throws Exception
-   {
-      SMIMESignedGenerator gen = new SMIMESignedGenerator();
-      SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", privateKey, cert);
-      gen.addSignerInfoGenerator(signer);
+    @Test
+    public void testPythonVerifiedBad() throws Exception {
+        SMIMESignedGenerator gen = new SMIMESignedGenerator();
+        SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", badKey, cert);
+        gen.addSignerInfoGenerator(signer);
 
-      MimeMultipart mp = gen.generate(createMsg());
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mp.writeTo(os);
-      String contentType = mp.getContentType();
-      contentType = contentType.replace("\r\n", "").replace("\t", " ");
-      System.out.println(contentType);
-      String s = new String(os.toByteArray());
-      StringBuilder builder = new StringBuilder();
-      builder.append("Content-Type: ").append(contentType).append("\r\n\r\n").append(s);
-      String output = builder.toString();
+        MimeMultipart mp = gen.generate(createMsg());
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mp.writeTo(os);
+        String contentType = mp.getContentType();
+        contentType = contentType.replace("\r\n", "").replace("\t", " ");
+        System.out.println(contentType);
+        String s = new String(os.toByteArray());
+        StringBuilder builder = new StringBuilder();
+        builder.append("Content-Type: ").append(contentType).append("\r\n\r\n").append(s);
+        String output = builder.toString();
 
-      FileOutputStream fp = new FileOutputStream("smime_signed.txt");
-      fp.write(output.getBytes());
-      fp.close();
-
-
-   }
-
-   @Test
-   public void testPythonVerifiedBad() throws Exception
-   {
-      SMIMESignedGenerator gen = new SMIMESignedGenerator();
-      SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder().setProvider("BC").build("SHA1WITHRSA", badKey, cert);
-      gen.addSignerInfoGenerator(signer);
-
-      MimeMultipart mp = gen.generate(createMsg());
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      mp.writeTo(os);
-      String contentType = mp.getContentType();
-      contentType = contentType.replace("\r\n", "").replace("\t", " ");
-      System.out.println(contentType);
-      String s = new String(os.toByteArray());
-      StringBuilder builder = new StringBuilder();
-      builder.append("Content-Type: ").append(contentType).append("\r\n\r\n").append(s);
-      String output = builder.toString();
-
-      FileOutputStream fp = new FileOutputStream("smime_signed_bad.txt");
-      fp.write(output.getBytes());
-      fp.close();
+        FileOutputStream fp = new FileOutputStream("smime_signed_bad.txt");
+        fp.write(output.getBytes());
+        fp.close();
 
 
-   }
+    }
 
 
 }

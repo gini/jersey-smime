@@ -14,17 +14,16 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface After
-{
-   int seconds() default 0;
+public @interface After {
+    int seconds() default 0;
 
-   int minutes() default 0;
+    int minutes() default 0;
 
-   int hours() default 0;
+    int hours() default 0;
 
-   int days() default 0;
+    int days() default 0;
 
-   int months() default 0;
+    int months() default 0;
 
-   int years() default 0;
+    int years() default 0;
 }

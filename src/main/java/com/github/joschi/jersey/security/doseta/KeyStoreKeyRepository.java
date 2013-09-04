@@ -17,77 +17,53 @@ import java.security.cert.CertificateException;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class KeyStoreKeyRepository
-{
-   private KeyStore keyStore;
-   private String password;
+public class KeyStoreKeyRepository {
+    private KeyStore keyStore;
+    private String password;
 
 
-   public KeyStoreKeyRepository(InputStream is, String password)
-   {
-      if (password != null) password = password.trim();
-      this.password = password;
-      try
-      {
-         keyStore = KeyStore.getInstance("JKS");
-         keyStore.load(is, password.toCharArray());
-      }
-      catch (KeyStoreException e)
-      {
-         throw new RuntimeException(e);
-      }
-      catch (IOException e)
-      {
-         throw new RuntimeException(e);
-      }
-      catch (NoSuchAlgorithmException e)
-      {
-         throw new RuntimeException(e);
-      }
-      catch (CertificateException e)
-      {
-         throw new RuntimeException(e);
-      }
-   }
+    public KeyStoreKeyRepository(InputStream is, String password) {
+        if (password != null) password = password.trim();
+        this.password = password;
+        try {
+            keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(is, password.toCharArray());
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-   public KeyStoreKeyRepository(String filename, String password) throws IOException
-   {
-      this(new FileInputStream(filename), password);
-   }
+    public KeyStoreKeyRepository(String filename, String password) throws IOException {
+        this(new FileInputStream(filename), password);
+    }
 
-   public PrivateKey getPrivateKey(Object identity)
-   {
-      try
-      {
-         Key key = keyStore.getKey(identity.toString(), password.toCharArray());
-         return (PrivateKey) key;
-      }
-      catch (KeyStoreException e)
-      {
-         throw new RuntimeException(e);
-      }
-      catch (NoSuchAlgorithmException e)
-      {
-         throw new RuntimeException(e);
-      }
-      catch (UnrecoverableKeyException e)
-      {
-         throw new RuntimeException(e);
-      }
-   }
+    public PrivateKey getPrivateKey(Object identity) {
+        try {
+            Key key = keyStore.getKey(identity.toString(), password.toCharArray());
+            return (PrivateKey) key;
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (UnrecoverableKeyException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-   public PublicKey getPublicKey(Object identity)
-   {
-      Certificate cert = null;
-      try
-      {
-         cert = keyStore.getCertificate(identity.toString());
-      }
-      catch (KeyStoreException e)
-      {
-         throw new RuntimeException(e);
-      }
-      if (cert == null) return null;
-      return cert.getPublicKey();
-   }
+    public PublicKey getPublicKey(Object identity) {
+        Certificate cert = null;
+        try {
+            cert = keyStore.getCertificate(identity.toString());
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        }
+        if (cert == null) return null;
+        return cert.getPublicKey();
+    }
 }

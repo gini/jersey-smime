@@ -1,7 +1,6 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
-import org.jboss.resteasy.spi.ReaderException;
 import org.jboss.resteasy.util.Types;
 
 import javax.mail.MessagingException;
@@ -59,7 +58,7 @@ public class SignedReader implements MessageBodyReader<SignedInput> {
             input.setProviders(providers);
             return input;
         } catch (MessagingException e) {
-            throw new ReaderException(e);
+            throw new RuntimeException(e);
         }
 
     }

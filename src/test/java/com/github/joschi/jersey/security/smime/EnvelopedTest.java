@@ -1,6 +1,7 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.PemUtils;
+import com.sun.jersey.core.util.Base64;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
 import org.bouncycastle.cms.CMSException;
@@ -16,7 +17,6 @@ import org.bouncycastle.mail.smime.SMIMEEnvelopedGenerator;
 import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMEUtil;
 import org.bouncycastle.operator.OutputEncryptor;
-import org.jboss.resteasy.util.Base64;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -93,13 +93,13 @@ public class EnvelopedTest {
         _msg.writeTo(encrypted);
         encrypted.close();
 
-        String str = Base64.encodeBytes(os.toByteArray(), Base64.DO_BREAK_LINES);
+        byte[] base64 = Base64.encode(os.toByteArray());
 
         ih = new InternetHeaders();
         ih.addHeader("Content-Disposition", "attachment; filename=\"smime.p7m\"");
         ih.addHeader("Content-Type", "application/pkcs7-mime; smime-type=enveloped-data; name=\"smime.p7m\"");
         ih.addHeader("Content-Transfer-Encoding", "base64");
-        MimeBodyPart mp = new MimeBodyPart(ih, str.getBytes());
+        MimeBodyPart mp = new MimeBodyPart(ih, base64);
 
         // output this to smime.txt for decrypt_smime.py
         //outputFile(mp);

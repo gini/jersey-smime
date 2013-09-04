@@ -1,14 +1,13 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
+import com.sun.jersey.core.util.Base64;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.operator.OutputEncryptor;
-import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
-import org.jboss.resteasy.spi.WriterException;
-import org.jboss.resteasy.util.Base64;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
@@ -80,10 +79,10 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
             _msg.writeTo(encrypted);
             encrypted.close();
             byte[] bytes = baos.toByteArray();
-            String str = Base64.encodeBytes(bytes, Base64.DO_BREAK_LINES);
-            os.write(str.getBytes());
+            byte[] base64 = Base64.encode(bytes);
+            os.write(base64);
         } catch (Exception e) {
-            throw new WriterException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -91,18 +90,18 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
         ByteArrayOutputStream bodyOs = new ByteArrayOutputStream();
         MessageBodyWriter writer = providers.getMessageBodyWriter(out.getType(), out.getGenericType(), null, out.getMediaType());
         if (writer == null) {
-            throw new WriterException("Failed to find writer for type: " + out.getType().getName());
+            throw new RuntimeException("Failed to find writer for type: " + out.getType().getName());
         }
-        MultivaluedMapImpl<String, Object> bodyHeaders = new MultivaluedMapImpl<String, Object>();
+        MultivaluedMap<String, String> bodyHeaders = new MultivaluedMapImpl();
         bodyHeaders.add("Content-Type", out.getMediaType().toString());
         writer.writeTo(out.getEntity(), out.getType(), out.getGenericType(), null, out.getMediaType(), bodyHeaders, bodyOs);
 
 
         InternetHeaders ih = new InternetHeaders();
 
-        for (Map.Entry<String, List<Object>> entry : bodyHeaders.entrySet()) {
-            for (Object value : entry.getValue()) {
-                ih.addHeader(entry.getKey(), value.toString());
+        for (Map.Entry<String, List<String>> entry : bodyHeaders.entrySet()) {
+            for (String value : entry.getValue()) {
+                ih.addHeader(entry.getKey(), value);
             }
         }
         return new MimeBodyPart(ih, bodyOs.toByteArray());

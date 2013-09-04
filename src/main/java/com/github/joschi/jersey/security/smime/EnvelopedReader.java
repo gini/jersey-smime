@@ -1,7 +1,6 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
-import org.jboss.resteasy.spi.ReaderException;
 import org.jboss.resteasy.util.Types;
 
 import javax.mail.MessagingException;
@@ -69,7 +68,7 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         try {
             body = new MimeBodyPart(new SequenceInputStream(is, entityStream));
         } catch (MessagingException e) {
-            throw new ReaderException(e);
+            throw new RuntimeException(e);
         }
         input.setProviders(providers);
         input.setAnnotations(annotations);

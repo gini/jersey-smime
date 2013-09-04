@@ -1,11 +1,11 @@
 package com.github.joschi.jersey.security.smime;
 
+import com.sun.jersey.core.header.InBoundHeaders;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.bouncycastle.mail.smime.SMIMEEnveloped;
 import org.bouncycastle.mail.smime.SMIMEUtil;
-import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.util.GenericType;
 
 import javax.mail.Header;
@@ -143,7 +143,7 @@ public class EnvelopedInputImpl implements EnvelopedInput {
     }
 
     public static Object extractEntity(Class t, Type gt, Annotation[] ann, MimeBodyPart decrypted, Providers providers) {
-        MultivaluedMap<String, String> mimeHeaders = new Headers<String>();
+        MultivaluedMap<String, String> mimeHeaders = new InBoundHeaders();
         Enumeration e = null;
         try {
             e = decrypted.getAllHeaders();

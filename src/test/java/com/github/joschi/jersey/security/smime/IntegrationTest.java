@@ -1,13 +1,9 @@
 package com.github.joschi.jersey.security.smime;
 
+import com.github.joschi.jersey.security.KeyTools;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
-import com.github.joschi.jersey.security.KeyTools;
-import com.github.joschi.jersey.security.smime.EnvelopedInput;
-import com.github.joschi.jersey.security.smime.EnvelopedOutput;
-import com.github.joschi.jersey.security.smime.SignedInput;
-import com.github.joschi.jersey.security.smime.SignedOutput;
 import org.jboss.resteasy.test.BaseResourceTest;
 import org.jboss.resteasy.test.TestPortProvider;
 import org.junit.Assert;

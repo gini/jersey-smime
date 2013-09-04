@@ -1,11 +1,9 @@
 package com.github.joschi.jersey.security.doseta;
 
-import org.jboss.resteasy.annotations.interception.ClientInterceptor;
-import org.jboss.resteasy.annotations.interception.HeaderDecoratorPrecedence;
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import com.github.joschi.jersey.annotations.security.doseta.After;
 import com.github.joschi.jersey.annotations.security.doseta.Verifications;
 import com.github.joschi.jersey.annotations.security.doseta.Verify;
+import org.jboss.resteasy.annotations.interception.HeaderDecoratorPrecedence;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
@@ -14,13 +12,10 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.AcceptedByMethod;
 import org.jboss.resteasy.spi.interception.ClientExecutionContext;
 import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
-import org.jboss.resteasy.spi.interception.MessageBodyReaderContext;
-import org.jboss.resteasy.spi.interception.MessageBodyReaderInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
 import java.lang.reflect.Method;
 
 /**

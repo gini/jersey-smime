@@ -1,5 +1,7 @@
 package com.github.joschi.jersey.security.smime;
 
+import com.github.joschi.jersey.security.DerUtils;
+import com.github.joschi.jersey.security.PemUtils;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
@@ -7,8 +9,6 @@ import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.mail.smime.SMIMESigned;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
-import com.github.joschi.jersey.security.DerUtils;
-import com.github.joschi.jersey.security.PemUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

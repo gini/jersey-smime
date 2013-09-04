@@ -1,11 +1,8 @@
 package com.github.joschi.jersey.security.doseta;
 
 import org.jboss.resteasy.annotations.interception.HeaderDecoratorPrecedence;
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.jboss.resteasy.spi.interception.ClientExecutionContext;
-import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 
 import javax.ws.rs.ext.Provider;

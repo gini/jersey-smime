@@ -1,6 +1,5 @@
 package com.github.joschi.jersey.security.smime;
 
-import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;

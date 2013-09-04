@@ -1,9 +1,6 @@
 package com.github.joschi.jersey.security.doseta;
 
 import org.jboss.resteasy.logging.Logger;
-import com.github.joschi.jersey.security.doseta.DKIMSignature;
-import com.github.joschi.jersey.security.doseta.DosetaKeyRepository;
-import com.github.joschi.jersey.security.doseta.Verification;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;

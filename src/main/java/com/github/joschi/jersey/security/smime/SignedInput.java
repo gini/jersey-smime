@@ -2,7 +2,6 @@ package com.github.joschi.jersey.security.smime;
 
 import org.jboss.resteasy.util.GenericType;
 
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 

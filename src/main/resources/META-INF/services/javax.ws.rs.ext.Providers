@@ -1,8 +1,3 @@
-com.github.joschi.jersey.security.doseta.ClientDigitalSigningHeaderDecorator
-com.github.joschi.jersey.security.doseta.ServerDigitalSigningHeaderDecorator
-com.github.joschi.jersey.security.doseta.DigitalSigningInterceptor
-com.github.joschi.jersey.security.doseta.DigitalVerificationHeaderDecorator
-com.github.joschi.jersey.security.doseta.DigitalVerificationInterceptor
 com.github.joschi.jersey.security.smime.EnvelopedReader
 com.github.joschi.jersey.security.smime.EnvelopedWriter
 com.github.joschi.jersey.security.smime.SignedReader

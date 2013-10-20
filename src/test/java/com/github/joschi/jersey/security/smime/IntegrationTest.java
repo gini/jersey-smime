@@ -2,7 +2,10 @@ package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.KeyTools;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
@@ -13,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+
 import java.io.FileOutputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -88,7 +92,15 @@ public class IntegrationTest extends JerseyTest {
     private static PrivateKey privateKey;
 
     public IntegrationTest() throws TestContainerException {
-        super("com.github.joschi.jersey.security.smime");
+        super(new LowLevelAppDescriptor.Builder(createResourceConfig())
+                      .build());
+    }
+
+    private static ResourceConfig createResourceConfig() {
+        ResourceConfig rc = new PackagesResourceConfig("com.github.joschi.jersey.security.smime");
+        rc.getSingletons().add(new EnvelopedWriter());
+        rc.getSingletons().add(new SignedWriter());
+        return rc;
     }
 
     @BeforeClass
@@ -165,12 +177,13 @@ public class IntegrationTest extends JerseyTest {
 
     @Test
     public void testEncryptedInput() throws Exception {
+
         EnvelopedOutput output = new EnvelopedOutput("input", "text/plain");
         output.setCertificate(cert);
         ClientResponse res = resource()
-                        .path("/smime/encrypted")
-                        .accept("*/*")
-                        .post(ClientResponse.class, output);
+                .path("/smime/encrypted")
+                .accept("*/*")
+                .post(ClientResponse.class, output);
         Assert.assertEquals(204, res.getStatus());
     }
 
@@ -194,9 +207,9 @@ public class IntegrationTest extends JerseyTest {
         output.setCertificate(cert);
         output.setPrivateKey(privateKey);
         ClientResponse res = resource()
-                        .path("/smime/signed")
-                        .accept("*/*")
-                        .post(ClientResponse.class, output);
+                .path("/smime/signed")
+                .accept("*/*")
+                .post(ClientResponse.class, output);
         Assert.assertEquals(204, res.getStatus());
     }
 }

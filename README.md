@@ -14,7 +14,7 @@ You must include the jersey-crypto project to use the S/MIME framework.
     <dependency>
         <groupId>com.github.joschi</groupId>
         <artifactId>jersey-smime</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
     </dependency>
 
 

@@ -2,8 +2,10 @@ package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.util.GenericType;
 import com.sun.jersey.core.header.InBoundHeaders;
+import org.bouncycastle.cms.Recipient;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
+import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.bouncycastle.mail.smime.SMIMEEnveloped;
 import org.bouncycastle.mail.smime.SMIMEUtil;
@@ -132,9 +134,10 @@ public class EnvelopedInputImpl implements EnvelopedInput {
             JceKeyTransRecipientId recId = new JceKeyTransRecipientId(cert);
 
             RecipientInformationStore recipients = m.getRecipientInfos();
-            RecipientInformation recipient = recipients.get(recId);
+            RecipientInformation recipientInfo = recipients.get(recId);
+            Recipient recipient = new JceKeyTransEnvelopedRecipient(pKey).setProvider("BC");
 
-            decrypted = SMIMEUtil.toMimeBodyPart(recipient.getContent(pKey, "BC"));
+            decrypted = SMIMEUtil.toMimeBodyPart(recipientInfo.getContent(recipient));
         } catch (Exception e1) {
             throw new RuntimeException(e1);
         }

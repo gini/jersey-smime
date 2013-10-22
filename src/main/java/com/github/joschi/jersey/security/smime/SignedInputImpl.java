@@ -3,6 +3,7 @@ package com.github.joschi.jersey.security.smime;
 import com.github.joschi.jersey.util.GenericType;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.mail.smime.SMIMESigned;
 
 import javax.mail.MessagingException;
@@ -133,8 +134,10 @@ public class SignedInputImpl implements SignedInput {
 
         SignerInformationStore signers = signed.getSignerInfos();
         SignerInformation signer = (SignerInformation) signers.getSigners().iterator().next();
-        return signer.verify(publicKey, "BC");
 
+        JcaSimpleSignerInfoVerifierBuilder signerInfoVerifierBuilder = new JcaSimpleSignerInfoVerifierBuilder();
+
+        return signer.verify(signerInfoVerifierBuilder.build(publicKey));
     }
 
 

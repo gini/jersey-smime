@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/joschi/jersey-smime.png?branch=master)](https://travis-ci.org/joschi/jersey-smime)
 
-Jersey S/MIME is a direct port of the S/MIME functionality in `resteasy-security` to the Jersey framework.
+Jersey S/MIME is a port of the S/MIME functionality in `resteasy-security` to the Jersey framework.
 
 S/MIME (Secure/Multipurpose Internet Mail Extensions) is a standard for public key encryption and signing of MIME data. MIME data being a set of headers and a message body. It's most often seen in the email world when somebody wants to encrypt and/or sign an email message they are sending across the internet. It can also be used for HTTP requests as well which is what the Jersey integration with S/MIME is all about. Jersey S/MIME allows you to easily encrypt and/or sign an email message using the S/MIME standard.
 

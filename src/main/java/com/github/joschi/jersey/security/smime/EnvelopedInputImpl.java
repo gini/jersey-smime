@@ -145,7 +145,7 @@ public class EnvelopedInputImpl implements EnvelopedInput {
         return extractEntity(t, gt, ann, decrypted, providers);
     }
 
-    public static Object extractEntity(Class t, Type gt, Annotation[] ann, MimeBodyPart decrypted, Providers providers) {
+    public static <T> Object extractEntity(Class<T> t, Type gt, Annotation[] ann, MimeBodyPart decrypted, Providers providers) {
         MultivaluedMap<String, String> mimeHeaders = new InBoundHeaders();
         Enumeration e = null;
         try {
@@ -160,7 +160,7 @@ public class EnvelopedInputImpl implements EnvelopedInput {
         String contentType = "text/plain";
         if (mimeHeaders.containsKey("Content-Type")) contentType = mimeHeaders.getFirst("Content-Type");
         MediaType mediaType = MediaType.valueOf(contentType);
-        MessageBodyReader reader = providers.getMessageBodyReader(t, gt, ann, mediaType);
+        MessageBodyReader<T> reader = providers.getMessageBodyReader(t, gt, ann, mediaType);
         if (reader == null) {
             throw new RuntimeException("Could not find a message body reader for type: " + t.getClass().getName());
         }

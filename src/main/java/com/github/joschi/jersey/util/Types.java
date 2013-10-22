@@ -20,7 +20,7 @@ public class Types
    /**
     * Is the genericType of a certain class?
     */
-   public static boolean isA(Class clazz, ParameterizedType pType)
+   public static <T> boolean isA(Class<T> clazz, ParameterizedType pType)
    {
       return clazz.isAssignableFrom((Class) pType.getRawType());
    }
@@ -107,7 +107,7 @@ public class Types
     * @param method interface method
     * @return
     */
-   public static Type getGenericReturnTypeOfGenericInterfaceMethod(Class clazz, Method method)
+   public static <T> Type getGenericReturnTypeOfGenericInterfaceMethod(Class<T> clazz, Method method)
    {
       if (!method.getDeclaringClass().isInterface()) return method.getGenericReturnType();
 
@@ -118,7 +118,7 @@ public class Types
       }
       catch (NoSuchMethodException e)
       {
-
+          // Do nothing
       }
       return method.getGenericReturnType();
    }
@@ -139,8 +139,8 @@ public class Types
 
       for (int i = 0; i < method.getParameterTypes().length; i++)
       {
-         Class rootParam = method.getParameterTypes()[i];
-         Class intfParam = intfMethod.getParameterTypes()[i];
+         Class<?> rootParam = method.getParameterTypes()[i];
+         Class<?> intfParam = intfMethod.getParameterTypes()[i];
          if (!intfParam.isAssignableFrom(rootParam)) return false;
       }
       return true;
@@ -153,7 +153,7 @@ public class Types
     * @param intfMethod
     * @return
     */
-   public static Method getImplementingMethod(Class clazz, Method intfMethod)
+   public static <T> Method getImplementingMethod(Class<T> clazz, Method intfMethod)
    {
       Class<?> declaringClass = intfMethod.getDeclaringClass();
       if (declaringClass.equals(clazz)) return intfMethod;
@@ -203,16 +203,16 @@ public class Types
       }
       catch (NoSuchMethodException e)
       {
+          // Do nothing
       }
 
       try
       {
-         Method tmp = clazz.getMethod(intfMethod.getName(), intfMethod.getParameterTypes());
-         return tmp;
+         return clazz.getMethod(intfMethod.getName(), intfMethod.getParameterTypes());
       }
       catch (NoSuchMethodException e)
       {
-
+          // Do nothing
       }
       return intfMethod;
    }
@@ -283,8 +283,7 @@ public class Types
    {
       if (!(genericType instanceof ParameterizedType)) return null;
       ParameterizedType parameterizedType = (ParameterizedType) genericType;
-      Class<?> typeArg = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-      return typeArg;
+      return (Class<?>) parameterizedType.getActualTypeArguments()[0];
    }
 
 

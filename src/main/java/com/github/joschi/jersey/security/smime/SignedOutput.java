@@ -12,7 +12,7 @@ import java.security.cert.X509Certificate;
  * @version $Revision: 1 $
  */
 public class SignedOutput extends SMIMEOutput {
-    protected PrivateKey privateKey;
+    private PrivateKey privateKey;
 
     public SignedOutput(Object obj, String mediaType) {
         super(obj, mediaType);

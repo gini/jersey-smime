@@ -1,10 +1,12 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.util.GenericType;
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.mail.smime.SMIMESigned;
+import org.bouncycastle.operator.OperatorCreationException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
@@ -75,11 +77,11 @@ public class SignedInputImpl implements SignedInput {
     }
 
     public Annotation[] getAnnotations() {
-        return annotations;
+        return annotations.clone();
     }
 
     public void setAnnotations(Annotation[] annotations) {
-        this.annotations = annotations;
+        this.annotations = annotations.clone();
     }
 
     public Providers getProviders() {
@@ -107,9 +109,11 @@ public class SignedInputImpl implements SignedInput {
     }
 
     public Object getEntity(Class t, Type gt, Annotation[] ann) {
-        if (entity != null) return entity;
+        if (entity != null) {
+            return entity;
+        }
 
-        MimeBodyPart mbp = null;
+        MimeBodyPart mbp;
         try {
             mbp = (MimeBodyPart) body.getBodyPart(0);
         } catch (MessagingException e) {
@@ -120,16 +124,20 @@ public class SignedInputImpl implements SignedInput {
     }
 
     public boolean verify() throws Exception {
-        if (certificate != null) return verify(certificate);
-        else if (publicKey != null) return verify(publicKey);
-        else throw new NullPointerException("Certificate nor public key properties set");
+        if (certificate != null) {
+            return verify(certificate);
+        } else if (publicKey != null) {
+            return verify(publicKey);
+        } else {
+            throw new IllegalStateException("Certificate nor public key properties set");
+        }
     }
 
-    public boolean verify(X509Certificate certificate) throws Exception {
+    public boolean verify(X509Certificate certificate) throws CMSException, MessagingException, OperatorCreationException {
         return verify(certificate.getPublicKey());
     }
 
-    public boolean verify(PublicKey publicKey) throws Exception {
+    public boolean verify(PublicKey publicKey) throws CMSException, MessagingException, OperatorCreationException {
         SMIMESigned signed = new SMIMESigned(body);
 
         SignerInformationStore signers = signed.getSignerInfos();

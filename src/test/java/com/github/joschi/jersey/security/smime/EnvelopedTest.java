@@ -197,7 +197,7 @@ public class EnvelopedTest {
 
     }
 
-    private MimeBodyPart decode2Mime(InputStream body) throws MessagingException, CMSException, SMIMEException, NoSuchProviderException, IOException {
+    private MimeBodyPart decode2Mime(InputStream body) throws MessagingException, CMSException, SMIMEException, IOException {
         StringBuilder builder = new StringBuilder();
         builder.append("Content-Disposition: attachment; filename=\"smime.p7m\"\r\n");
         builder.append("Content-Type: application/pkcs7-mime; smime-type=enveloped-data; name=\"smime.p7m\"\r\n");
@@ -207,7 +207,7 @@ public class EnvelopedTest {
         return decode2Mime(mp);
     }
 
-    private MimeBodyPart decode2Mime(MimeBodyPart mp) throws MessagingException, CMSException, SMIMEException, NoSuchProviderException, IOException {
+    private MimeBodyPart decode2Mime(MimeBodyPart mp) throws MessagingException, CMSException, SMIMEException {
         final Recipient recipient = new JceKeyTransEnvelopedRecipient(privateKey);
         final RecipientId recipientId = new JceKeyTransRecipientId(cert);
 

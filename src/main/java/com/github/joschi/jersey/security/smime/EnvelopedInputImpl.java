@@ -83,11 +83,11 @@ public class EnvelopedInputImpl implements EnvelopedInput {
     }
 
     public Annotation[] getAnnotations() {
-        return annotations;
+        return annotations.clone();
     }
 
     public void setAnnotations(Annotation[] annotations) {
-        this.annotations = annotations;
+        this.annotations = annotations.clone();
     }
 
     public Providers getProviders() {
@@ -127,7 +127,8 @@ public class EnvelopedInputImpl implements EnvelopedInput {
     }
 
     public Object getEntity(Class t, Type gt, Annotation[] ann, PrivateKey pKey, X509Certificate cert) {
-        MimeBodyPart decrypted = null;
+        final MimeBodyPart decrypted;
+
         try {
             MimeBodyPart encryptedBodyPart = body;
             SMIMEEnveloped m = new SMIMEEnveloped(encryptedBodyPart);
@@ -147,7 +148,7 @@ public class EnvelopedInputImpl implements EnvelopedInput {
 
     public static <T> Object extractEntity(Class<T> t, Type gt, Annotation[] ann, MimeBodyPart decrypted, Providers providers) {
         MultivaluedMap<String, String> mimeHeaders = new InBoundHeaders();
-        Enumeration e = null;
+        final Enumeration e;
         try {
             e = decrypted.getAllHeaders();
         } catch (MessagingException e1) {
@@ -158,7 +159,9 @@ public class EnvelopedInputImpl implements EnvelopedInput {
             mimeHeaders.add(header.getName(), header.getValue());
         }
         String contentType = "text/plain";
-        if (mimeHeaders.containsKey("Content-Type")) contentType = mimeHeaders.getFirst("Content-Type");
+        if (mimeHeaders.containsKey("Content-Type")) {
+            contentType = mimeHeaders.getFirst("Content-Type");
+        }
         MediaType mediaType = MediaType.valueOf(contentType);
         MessageBodyReader<T> reader = providers.getMessageBodyReader(t, gt, ann, mediaType);
         if (reader == null) {

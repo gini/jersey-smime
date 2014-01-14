@@ -32,7 +32,7 @@ public class SignedReader implements MessageBodyReader<SignedInput> {
     }
 
     @Context
-    Providers providers;
+    private Providers providers;
 
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return SignedInput.class.isAssignableFrom(type);
@@ -42,7 +42,7 @@ public class SignedReader implements MessageBodyReader<SignedInput> {
         Class<?> baseType = null;
         Type baseGenericType = null;
 
-        if (genericType != null && genericType instanceof ParameterizedType) {
+        if (genericType instanceof ParameterizedType) {
             ParameterizedType param = (ParameterizedType) genericType;
             baseGenericType = param.getActualTypeArguments()[0];
             baseType = Types.getRawType(baseGenericType);

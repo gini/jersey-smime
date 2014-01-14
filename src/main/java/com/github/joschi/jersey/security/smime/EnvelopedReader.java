@@ -32,8 +32,10 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         BouncyIntegration.init();
     }
 
+    private static final String CRLF = "\r\n";
+
     @Context
-    protected Providers providers;
+    private Providers providers;
 
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return EnvelopedInput.class.isAssignableFrom(type);
@@ -43,7 +45,7 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         Class<?> baseType = null;
         Type baseGenericType = null;
 
-        if (genericType != null && genericType instanceof ParameterizedType) {
+        if (genericType instanceof ParameterizedType) {
             ParameterizedType param = (ParameterizedType) genericType;
             baseGenericType = param.getActualTypeArguments()[0];
             baseType = Types.getRawType(baseGenericType);
@@ -54,17 +56,17 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
 
         StringBuilder headerString = new StringBuilder();
         if (headers.containsKey("Content-Disposition")) {
-            headerString.append("Content-Disposition: ").append(headers.getFirst("Content-Disposition")).append("\r\n");
+            headerString.append("Content-Disposition: ").append(headers.getFirst("Content-Disposition")).append(CRLF);
         }
         if (headers.containsKey("Content-Type")) {
-            headerString.append("Content-Type: ").append(headers.getFirst("Content-Type")).append("\r\n");
+            headerString.append("Content-Type: ").append(headers.getFirst("Content-Type")).append(CRLF);
         }
         if (headers.containsKey("Content-Transfer-Encoding")) {
-            headerString.append("Content-Transfer-Encoding: ").append(headers.getFirst("Content-Transfer-Encoding")).append("\r\n");
+            headerString.append("Content-Transfer-Encoding: ").append(headers.getFirst("Content-Transfer-Encoding")).append(CRLF);
         }
-        headerString.append("\r\n");
+        headerString.append(CRLF);
         ByteArrayInputStream is = new ByteArrayInputStream(headerString.toString().getBytes("utf-8"));
-        MimeBodyPart body = null;
+        MimeBodyPart body;
         try {
             body = new MimeBodyPart(new SequenceInputStream(is, entityStream));
         } catch (MessagingException e) {

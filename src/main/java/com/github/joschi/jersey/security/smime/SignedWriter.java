@@ -31,7 +31,7 @@ public class SignedWriter implements MessageBodyWriter<SignedOutput> {
     }
 
     @Context
-    protected Providers providers;
+    private Providers providers;
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

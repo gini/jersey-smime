@@ -18,17 +18,16 @@ import java.lang.reflect.Type;
  */
 public class GenericType<T>
 {
-   final Class<T> type;
-   final Type genericType;
+   private final Class<T> type;
+   private final Type genericType;
 
    /**
     * Constructs a new generic entity. Derives represented class from type
     * parameter. Note that this constructor is protected, users should create
     * a (usually anonymous) subclass as shown above.
-    *
-    * @param entity the entity instance, must not be null
     * @throws IllegalArgumentException if entity is null
     */
+   @SuppressWarnings("unchecked")
    protected GenericType()
    {
       Type superclass = getClass().getGenericSuperclass();

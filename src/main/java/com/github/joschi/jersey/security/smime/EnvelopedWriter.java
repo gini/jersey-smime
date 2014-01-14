@@ -40,7 +40,7 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
     }
 
     @Context
-    protected Providers providers;
+    private Providers providers;
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -54,8 +54,6 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
 
     @Override
     public void writeTo(EnvelopedOutput out, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException, WebApplicationException {
-        ByteArrayOutputStream baos = null;
-        OutputStream encrypted = null;
         try {
             headers.putSingle("Content-Disposition", "attachment; filename=\"smime.p7m\"");
             headers.putSingle("Content-Type", "application/pkcs7-mime; smime-type=enveloped-data; name=\"smime.p7m\"");
@@ -64,19 +62,21 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
             OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(CMSAlgorithm.DES_EDE3_CBC)
                     .setProvider("BC")
                     .build();
-            if (out.getCertificate() == null) throw new NullPointerException("The certificate object was not set.");
+            if (out.getCertificate() == null) {
+                throw new NullPointerException("The certificate object was not set.");
+            }
             JceKeyTransRecipientInfoGenerator infoGenerator = new JceKeyTransRecipientInfoGenerator(out.getCertificate());
             infoGenerator.setProvider("BC");
             CMSEnvelopedDataStreamGenerator generator = new CMSEnvelopedDataStreamGenerator();
             generator.addRecipientInfoGenerator(infoGenerator);
 
 
-            MimeBodyPart _msg = createBodyPart(providers, out);
+            MimeBodyPart message = createBodyPart(providers, out);
 
-            baos = new ByteArrayOutputStream();
-            encrypted = generator.open(baos, encryptor);
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final OutputStream encrypted = generator.open(baos, encryptor);
 
-            _msg.writeTo(encrypted);
+            message.writeTo(encrypted);
             encrypted.close();
             byte[] bytes = baos.toByteArray();
             String str = Base64.encodeBytes(bytes, Base64.DO_BREAK_LINES);
@@ -86,12 +86,15 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static MimeBodyPart createBodyPart(Providers providers, SMIMEOutput out) throws IOException, MessagingException {
         ByteArrayOutputStream bodyOs = new ByteArrayOutputStream();
         MessageBodyWriter writer = providers.getMessageBodyWriter(out.getType(), out.getGenericType(), null, out.getMediaType());
+
         if (writer == null) {
             throw new RuntimeException("Failed to find writer for type: " + out.getType().getName());
         }
+
         MultivaluedMap<String, String> bodyHeaders = new MultivaluedMapImpl();
         bodyHeaders.add("Content-Type", out.getMediaType().toString());
         writer.writeTo(out.getEntity(), out.getType(), out.getGenericType(), null, out.getMediaType(), bodyHeaders, bodyOs);

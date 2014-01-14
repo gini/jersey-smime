@@ -24,21 +24,22 @@ import java.util.Date;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class KeyTools {
+public final class KeyTools {
     static {
         BouncyIntegration.init();
     }
 
-    public static X509Certificate generateTestCertificate(KeyPair pair) throws NoSuchProviderException,
-            CertificateException, OperatorCreationException {
+    private KeyTools() {
+    }
 
-        X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
-        X500Name cn = nameBuilder.addRDN(BCStyle.CN, "Test Certificate").build();
+    public static X509Certificate generateTestCertificate(KeyPair pair) throws CertificateException, OperatorCreationException {
+        final X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
+        final X500Name cn = nameBuilder.addRDN(BCStyle.CN, "Test Certificate").build();
 
-        byte[] encoded = pair.getPublic().getEncoded();
-        SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(ASN1Sequence.getInstance(encoded));
+        final byte[] encoded = pair.getPublic().getEncoded();
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(ASN1Sequence.getInstance(encoded));
 
-        X509v1CertificateBuilder certBuilder = new X509v1CertificateBuilder(
+        final X509v1CertificateBuilder certBuilder = new X509v1CertificateBuilder(
                 cn,
                 BigInteger.valueOf(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis() - 10000),
@@ -47,9 +48,9 @@ public class KeyTools {
                 subjectPublicKeyInfo
         );
 
-        JcaContentSignerBuilder contentSignerBuilder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
-        ContentSigner contentSigner = contentSignerBuilder.build(pair.getPrivate());
-        X509CertificateHolder certificateHolder = certBuilder.build(contentSigner);
+        final JcaContentSignerBuilder contentSignerBuilder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
+        final ContentSigner contentSigner = contentSignerBuilder.build(pair.getPrivate());
+        final X509CertificateHolder certificateHolder = certBuilder.build(contentSigner);
 
         return new JcaX509CertificateConverter().setProvider( "BC" ).getCertificate(certificateHolder);
     }

@@ -2,13 +2,22 @@ package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.DerUtils;
 import com.github.joschi.jersey.security.PemUtils;
+import org.bouncycastle.cms.CMSSignatureAlgorithmNameGenerator;
+import org.bouncycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.mail.smime.SMIMESigned;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DigestCalculatorProvider;
+import org.bouncycastle.operator.SignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -127,7 +136,21 @@ public class SignedTest {
         SignerInformationStore signers = signed.getSignerInfos();
         Assert.assertEquals(1, signers.size());
         SignerInformation signer = (SignerInformation) signers.getSigners().iterator().next();
-        Assert.assertTrue(signer.verify(cert.getPublicKey(), "BC"));
+
+
+        final CMSSignatureAlgorithmNameGenerator cmsSignatureAlgorithmNameGenerator = new DefaultCMSSignatureAlgorithmNameGenerator();
+        final SignatureAlgorithmIdentifierFinder signatureAlgorithmIdentifierFinder = new DefaultSignatureAlgorithmIdentifierFinder();
+        final JcaContentVerifierProviderBuilder jcaContentVerifierProviderBuilder = new JcaContentVerifierProviderBuilder();
+        final ContentVerifierProvider contentVerifierProvider = jcaContentVerifierProviderBuilder.build(cert.getPublicKey());
+        final DigestCalculatorProvider digestCalculatorProvider = new BcDigestCalculatorProvider();
+
+        SignerInformationVerifier verifier = new SignerInformationVerifier(
+                cmsSignatureAlgorithmNameGenerator,
+                signatureAlgorithmIdentifierFinder,
+                contentVerifierProvider,
+                digestCalculatorProvider);
+
+        Assert.assertTrue(signer.verify(verifier));
     }
 
     @Test

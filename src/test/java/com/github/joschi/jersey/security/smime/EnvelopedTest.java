@@ -5,10 +5,13 @@ import com.sun.jersey.core.util.Base64;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.Recipient;
 import org.bouncycastle.cms.RecipientId;
+import org.bouncycastle.cms.RecipientInfoGenerator;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
+import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -125,7 +128,9 @@ public class EnvelopedTest {
         OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(CMSAlgorithm.DES_EDE3_CBC)
                 .setProvider("BC")
                 .build();
-        gen.addKeyTransRecipient(cert);
+
+        RecipientInfoGenerator generator = new JceKeyTransRecipientInfoGenerator(cert);
+        gen.addRecipientInfoGenerator(generator);
 
         //
         // generate a MimeBodyPart object which encapsulates the content
@@ -203,13 +208,14 @@ public class EnvelopedTest {
     }
 
     private MimeBodyPart decode2Mime(MimeBodyPart mp) throws MessagingException, CMSException, SMIMEException, NoSuchProviderException, IOException {
-        SMIMEEnveloped m = new SMIMEEnveloped(mp);
-        RecipientId recId = new JceKeyTransRecipientId(cert);
+        final Recipient recipient = new JceKeyTransEnvelopedRecipient(privateKey);
+        final RecipientId recipientId = new JceKeyTransRecipientId(cert);
 
-        RecipientInformationStore recipients = m.getRecipientInfos();
-        RecipientInformation recipient = recipients.get(recId);
+        final SMIMEEnveloped m = new SMIMEEnveloped(mp);
+        final RecipientInformationStore recipients = m.getRecipientInfos();
+        final RecipientInformation recipientInformation = recipients.get(recipientId);
 
-        return SMIMEUtil.toMimeBodyPart(recipient.getContent(privateKey, "BC"));
+        return SMIMEUtil.toMimeBodyPart(recipientInformation.getContent(recipient));
     }
 
 

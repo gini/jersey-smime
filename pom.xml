@@ -176,6 +176,7 @@
                 <version>2.9.1</version>
                 <configuration>
                     <aggregate>true</aggregate>
+                    <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
                 <executions>
                     <execution>
@@ -257,6 +258,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
                 <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
                     <show>public</show>
                 </configuration>
             </plugin>

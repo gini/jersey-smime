@@ -77,7 +77,7 @@
     </distributionManagement>
 
     <properties>
-        <jersey.version>1.18</jersey.version>
+        <jersey.version>1.18.1</jersey.version>
         <bouncycastle.version>1.50</bouncycastle.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

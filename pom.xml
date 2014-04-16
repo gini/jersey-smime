@@ -74,6 +74,10 @@
             <name>Nexus Release Repository</name>
             <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <site>
+            <id>jersey-smime-site</id>
+            <url>http://joschi.github.io/jersey-smime/${project.version}</url>
+        </site>
     </distributionManagement>
 
     <properties>

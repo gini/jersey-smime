@@ -13,7 +13,7 @@
 
     <groupId>com.github.joschi</groupId>
     <artifactId>jersey-smime</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Jersey S/MIME</name>

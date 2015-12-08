@@ -1,5 +1,6 @@
 package com.github.joschi.jersey.security.smime;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
 /**

@@ -34,10 +34,12 @@ public class SignedReader implements MessageBodyReader<SignedInput> {
     @Context
     private Providers providers;
 
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return SignedInput.class.isAssignableFrom(type);
     }
 
+    @Override
     public SignedInput readFrom(Class<SignedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException, WebApplicationException {
         Class<?> baseType = null;
         Type baseGenericType = null;

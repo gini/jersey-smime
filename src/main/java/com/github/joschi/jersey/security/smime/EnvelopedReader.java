@@ -13,10 +13,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -37,10 +34,12 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
     @Context
     private Providers providers;
 
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return EnvelopedInput.class.isAssignableFrom(type);
     }
 
+    @Override
     public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException, WebApplicationException {
         Class<?> baseType = null;
         Type baseGenericType = null;
@@ -61,14 +60,15 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         if (headers.containsKey("Content-Type")) {
             headerString.append("Content-Type: ").append(headers.getFirst("Content-Type")).append(CRLF);
         }
-        if (headers.containsKey("Content-Transfer-Encoding")) {
-            headerString.append("Content-Transfer-Encoding: ").append(headers.getFirst("Content-Transfer-Encoding")).append(CRLF);
+        InputStream decodedEntityStream = entityStream;
+        if ("base64".equalsIgnoreCase(headers.getFirst("Content-Transfer-Encoding"))) {
+            decodedEntityStream = java.util.Base64.getMimeDecoder().wrap(entityStream);
         }
         headerString.append(CRLF);
         ByteArrayInputStream is = new ByteArrayInputStream(headerString.toString().getBytes("utf-8"));
         MimeBodyPart body;
         try {
-            body = new MimeBodyPart(new SequenceInputStream(is, entityStream));
+            body = new MimeBodyPart(new SequenceInputStream(is, decodedEntityStream));
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }

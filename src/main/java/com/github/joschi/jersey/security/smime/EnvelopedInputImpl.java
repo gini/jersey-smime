@@ -1,7 +1,11 @@
 package com.github.joschi.jersey.security.smime;
 
+import com.github.joschi.jersey.util.Base64;
 import com.github.joschi.jersey.util.GenericType;
-import com.sun.jersey.core.header.InBoundHeaders;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.cms.Recipient;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
@@ -14,9 +18,11 @@ import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Providers;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -130,8 +136,8 @@ public class EnvelopedInputImpl implements EnvelopedInput {
         final MimeBodyPart decrypted;
 
         try {
-            MimeBodyPart encryptedBodyPart = body;
-            SMIMEEnveloped m = new SMIMEEnveloped(encryptedBodyPart);
+            MimeBodyPart encryptedBodyPartBase64 = body;
+            SMIMEEnveloped m = new SMIMEEnveloped(encryptedBodyPartBase64);
             JceKeyTransRecipientId recId = new JceKeyTransRecipientId(cert);
 
             RecipientInformationStore recipients = m.getRecipientInfos();
@@ -147,7 +153,7 @@ public class EnvelopedInputImpl implements EnvelopedInput {
     }
 
     public static <T> Object extractEntity(Class<T> t, Type gt, Annotation[] ann, MimeBodyPart decrypted, Providers providers) {
-        MultivaluedMap<String, String> mimeHeaders = new InBoundHeaders();
+        MultivaluedMap<String, String> mimeHeaders = new MultivaluedHashMap<String, String>();
         final Enumeration e;
         try {
             e = decrypted.getAllHeaders();

@@ -7,3 +7,14 @@
 
 # Maven
 target/
+
+# Idea
+.idea/
+jersey-smime.iml
+
+# Test data
+python_encrypted_signed.txt
+smime_signed.txt
+smime_signed_bad.txt
+
+

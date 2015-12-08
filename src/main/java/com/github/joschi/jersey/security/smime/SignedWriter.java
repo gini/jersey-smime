@@ -6,7 +6,6 @@ import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 
 import javax.mail.internet.MimeMultipart;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -24,7 +23,6 @@ import java.lang.reflect.Type;
  * @version $Revision: 1 $
  */
 @Provider
-@Produces("*/*")
 public class SignedWriter implements MessageBodyWriter<SignedOutput> {
     static {
         BouncyIntegration.init();

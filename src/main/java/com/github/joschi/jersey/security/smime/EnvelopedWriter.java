@@ -2,7 +2,6 @@ package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
 import com.github.joschi.jersey.util.Base64;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
@@ -12,10 +11,10 @@ import org.bouncycastle.operator.OutputEncryptor;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
@@ -33,7 +32,6 @@ import java.util.Map;
  * @version $Revision: 1 $
  */
 @Provider
-@Produces("*/*")
 public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
     static {
         BouncyIntegration.init();
@@ -95,7 +93,7 @@ public class EnvelopedWriter implements MessageBodyWriter<EnvelopedOutput> {
             throw new RuntimeException("Failed to find writer for type: " + out.getType().getName());
         }
 
-        MultivaluedMap<String, String> bodyHeaders = new MultivaluedMapImpl();
+        MultivaluedMap<String, String> bodyHeaders = new MultivaluedHashMap<String, String>();
         bodyHeaders.add("Content-Type", out.getMediaType().toString());
         writer.writeTo(out.getEntity(), out.getType(), out.getGenericType(), null, out.getMediaType(), bodyHeaders, bodyOs);
 

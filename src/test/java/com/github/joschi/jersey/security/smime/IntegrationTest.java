@@ -44,7 +44,7 @@ public class IntegrationTest extends JerseyTest {
         }
 
         @POST
-        public void post(EnvelopedInput<String> input, @HeaderParam("Content-Transfer-Encoding") final String encoding) {
+        public void post(EnvelopedInput<String> input) {
             String str = input.getEntity(privateKey, cert);
             Assert.assertEquals("input", str);
         }

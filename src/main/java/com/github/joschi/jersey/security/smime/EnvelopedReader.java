@@ -1,6 +1,7 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
+import com.github.joschi.jersey.util.Base64;
 import com.github.joschi.jersey.util.Types;
 
 import javax.mail.MessagingException;
@@ -13,7 +14,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -40,7 +44,8 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
     }
 
     @Override
-    public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException, WebApplicationException {
+    public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws
+                                    IOException, WebApplicationException {
         Class<?> baseType = null;
         Type baseGenericType = null;
 
@@ -62,7 +67,7 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         }
         InputStream decodedEntityStream = entityStream;
         if ("base64".equalsIgnoreCase(headers.getFirst("Content-Transfer-Encoding"))) {
-            decodedEntityStream = java.util.Base64.getMimeDecoder().wrap(entityStream);
+            decodedEntityStream = new Base64.InputStream(entityStream, Base64.DO_BREAK_LINES);
         }
         headerString.append(CRLF);
         ByteArrayInputStream is = new ByteArrayInputStream(headerString.toString().getBytes("utf-8"));

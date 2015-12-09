@@ -29,7 +29,7 @@ Since the S/MIME protocol depends on the `Content-Transfer-Encoding` header, the
     
     System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
-See https://jersey.java.net/nonav/documentation/latest/user-guide.html#d0e4957 for more information on these limitations.
+See https://jersey.java.net/nonav/documentation/2.22.1/user-guide.html#d0e4957 for more information on these limitations.
 
 ### Message Body Encryption ###
 
@@ -184,6 +184,7 @@ Contributors
 ------------
 
 * Raffael Stein (@mrmaloke)
+* Nico v. Hoyningen-Huene (@nicolone)
 
 
 License

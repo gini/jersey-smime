@@ -22,10 +22,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.io.FileOutputStream;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -113,7 +114,7 @@ public class IntegrationTest extends JerseyTest {
 
     @Override
     public TestContainerFactory getTestContainerFactory() {
-        //return new InMemoryTestContainerFactory(); -> failing since headers are not set
+        //InMemoryTestContainerFactory would fail due to a bug which does not set headers correctly
         System.setProperty("sun.net.http.allowRestrictedHeaders", "true"); //Otherwise Content-Transfer-Encoding is erased
         return new JdkHttpServerTestContainerFactory();
     }

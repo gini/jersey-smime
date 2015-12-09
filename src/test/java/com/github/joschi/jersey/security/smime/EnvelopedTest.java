@@ -1,6 +1,7 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.PemUtils;
+import com.github.joschi.jersey.util.Base64;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
 import org.bouncycastle.cms.CMSException;
@@ -19,7 +20,6 @@ import org.bouncycastle.mail.smime.SMIMEEnvelopedGenerator;
 import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMEUtil;
 import org.bouncycastle.operator.OutputEncryptor;
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.SequenceInputStream;
+import java.nio.ByteBuffer;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -95,7 +96,7 @@ public class EnvelopedTest {
         _msg.writeTo(encrypted);
         encrypted.close();
 
-        byte[] base64 = Base64.encode(os.toByteArray());
+        byte[] base64 = Base64.encodeBytesToBytes(os.toByteArray());
 
         ih = new InternetHeaders();
         ih.addHeader("Content-Disposition", "attachment; filename=\"smime.p7m\"");

@@ -1,7 +1,6 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.BouncyIntegration;
-import com.github.joschi.jersey.util.Base64;
 import com.github.joschi.jersey.util.Types;
 
 import javax.mail.MessagingException;
@@ -65,15 +64,14 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         if (headers.containsKey("Content-Type")) {
             headerString.append("Content-Type: ").append(headers.getFirst("Content-Type")).append(CRLF);
         }
-        InputStream decodedEntityStream = entityStream;
         if ("base64".equalsIgnoreCase(headers.getFirst("Content-Transfer-Encoding"))) {
-            decodedEntityStream = new Base64.InputStream(entityStream, Base64.DO_BREAK_LINES);
+            headerString.append("Content-Transfer-Encoding: ").append(headers.getFirst("Content-Transfer-Encoding")).append(CRLF);
         }
         headerString.append(CRLF);
         ByteArrayInputStream is = new ByteArrayInputStream(headerString.toString().getBytes("utf-8"));
         MimeBodyPart body;
         try {
-            body = new MimeBodyPart(new SequenceInputStream(is, decodedEntityStream));
+            body = new MimeBodyPart(new SequenceInputStream(is, entityStream));
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }

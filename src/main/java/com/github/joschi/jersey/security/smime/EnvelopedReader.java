@@ -37,11 +37,14 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
     @Context
     private Providers providers;
 
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return EnvelopedInput.class.isAssignableFrom(type);
     }
 
-    public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException, WebApplicationException {
+    @Override
+    public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws
+                                    IOException, WebApplicationException {
         Class<?> baseType = null;
         Type baseGenericType = null;
 
@@ -61,7 +64,7 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         if (headers.containsKey("Content-Type")) {
             headerString.append("Content-Type: ").append(headers.getFirst("Content-Type")).append(CRLF);
         }
-        if (headers.containsKey("Content-Transfer-Encoding")) {
+        if ("base64".equalsIgnoreCase(headers.getFirst("Content-Transfer-Encoding"))) {
             headerString.append("Content-Transfer-Encoding: ").append(headers.getFirst("Content-Transfer-Encoding")).append(CRLF);
         }
         headerString.append(CRLF);

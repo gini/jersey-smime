@@ -1,21 +1,25 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.KeyTools;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.LowLevelAppDescriptor;
-import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.jdkhttp.JdkHttpServerTestContainerFactory;
+import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import java.io.FileOutputStream;
 import java.security.KeyPair;
@@ -29,6 +33,7 @@ import java.security.cert.X509Certificate;
  * @version $Revision: 1 $
  */
 public class IntegrationTest extends JerseyTest {
+
     @Path("/smime/encrypted")
     public static class EncryptedResource {
         @GET
@@ -91,16 +96,36 @@ public class IntegrationTest extends JerseyTest {
     private static X509Certificate cert;
     private static PrivateKey privateKey;
 
-    public IntegrationTest() throws TestContainerException {
-        super(new LowLevelAppDescriptor.Builder(createResourceConfig())
-                      .build());
+    public IntegrationTest() {
+
     }
 
-    private static ResourceConfig createResourceConfig() {
-        ResourceConfig rc = new PackagesResourceConfig("com.github.joschi.jersey.security.smime");
-        rc.getSingletons().add(new EnvelopedWriter());
-        rc.getSingletons().add(new SignedWriter());
-        return rc;
+    @Override
+    protected Application configure() {
+        final ResourceConfig config = new ResourceConfig();
+        config.packages("com.github.joschi.jersey.security.smime");
+        config.register(EnvelopedWriter.class);
+        config.register(SignedWriter.class);
+        config.register(EnvelopedReader.class);
+        config.register(SignedReader.class);
+        config.register(LoggingFilter.class);
+        return config;
+    }
+
+    @Override
+    public TestContainerFactory getTestContainerFactory() {
+        //InMemoryTestContainerFactory would fail due to a bug which does not set headers correctly
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true"); //Otherwise Content-Transfer-Encoding is erased
+        return new JdkHttpServerTestContainerFactory();
+    }
+
+    @Override
+    protected void configureClient(final ClientConfig config) {
+        config.register(EnvelopedWriter.class);
+        config.register(SignedWriter.class);
+        config.register(EnvelopedReader.class);
+        config.register(SignedReader.class);
+        config.register(LoggingFilter.class);
     }
 
     @BeforeClass
@@ -112,78 +137,79 @@ public class IntegrationTest extends JerseyTest {
 
     @Test
     public void testSignedOutput() throws Exception {
-        ClientResponse res = resource().path("/smime/signed").get(ClientResponse.class);
+        Response res = target("/smime/signed").request().get();
         Assert.assertEquals(200, res.getStatus());
-        System.out.println(res.getEntity(String.class));
-        MediaType contentType = MediaType.valueOf(res.getHeaders().getFirst("Content-Type"));
+        final String entity = res.readEntity(String.class);
+        MediaType contentType = MediaType.valueOf(res.getHeaders().getFirst("Content-Type").toString());
+        Assert.assertTrue(contentType.toString().startsWith("multipart/signed"));
+        System.out.println(entity);
         System.out.println(contentType);
     }
 
     @Test
     public void testSignedOutput2() throws Exception {
-        /*ClientRequest request = new ClientRequest(TestPortProvider.generateURL("/smime/signed"));
-        SignedInput signed = request.getTarget(SignedInput.class);
+        Response response = target("/smime/signed").request().get();
+        SignedInput signed = response.readEntity(SignedInput.class);
         String output = (String) signed.getEntity(String.class);
         System.out.println(output);
         Assert.assertEquals("hello world", output);
-        Assert.assertTrue(signed.verify(cert));*/
+        Assert.assertTrue(signed.verify(cert));
     }
 
     @Test
     public void testEncryptedOutput() throws Exception {
-        ClientResponse res = resource().path("/smime/encrypted").get(ClientResponse.class);
+        Response res = target("/smime/encrypted").request().get();
         Assert.assertEquals(200, res.getStatus());
-        System.out.println(res.getEntity(String.class));
-        MediaType contentType = MediaType.valueOf(res.getHeaders().getFirst("Content-Type"));
+        System.out.println(res.readEntity(String.class));
+        MediaType contentType = MediaType.valueOf(res.getHeaders().getFirst("Content-Type").toString());
         System.out.println(contentType);
     }
 
     @Test
     public void testEncryptedOutput2() throws Exception {
-        /*ClientRequest request = new ClientRequest(TestPortProvider.generateURL("/smime/encrypted"));
-        EnvelopedInput enveloped = request.getTarget(EnvelopedInput.class);
+        Response response = target("/smime/encrypted").request().get();
+        EnvelopedInput enveloped = response.readEntity(EnvelopedInput.class);
         String output = (String) enveloped.getEntity(String.class, privateKey, cert);
         System.out.println(output);
-        Assert.assertEquals("hello world", output);*/
+        Assert.assertEquals("hello world", output);
     }
 
     @Test
     public void testEncryptedSignedOutputToFile() throws Exception {
-        ClientResponse res = resource().path("/smime/encrypted/signed").get(ClientResponse.class);
-        MediaType contentType = MediaType.valueOf(res.getHeaders().getFirst("Content-Type"));
+        Response res = target("/smime/encrypted/signed").request().get();
+        MediaType contentType = MediaType.valueOf(res.getHeaders().getFirst("Content-Type").toString());
         System.out.println(contentType);
         System.out.println();
-        System.out.println(res.getEntity(String.class));
+        String entity = res.readEntity(String.class);
+        System.out.println(entity);
 
         FileOutputStream os = new FileOutputStream("python_encrypted_signed.txt");
         os.write("Content-Type: ".getBytes());
         os.write(contentType.toString().getBytes());
         os.write("\r\n".getBytes());
-        os.write(res.getEntity(String.class).getBytes());
+        os.write(entity.getBytes());
         os.close();
     }
 
     @Test
     public void testEncryptedSignedOutput() throws Exception {
-        /*ClientRequest request = new ClientRequest(TestPortProvider.generateURL("/smime/encrypted/signed"));
-        EnvelopedInput enveloped = request.getTarget(EnvelopedInput.class);
+        Response response = target("/smime/encrypted/signed").request().get();
+        EnvelopedInput enveloped = response.readEntity(EnvelopedInput.class);
         SignedInput signed = (SignedInput) enveloped.getEntity(SignedInput.class, privateKey, cert);
         String output = (String) signed.getEntity(String.class);
         System.out.println(output);
         Assert.assertEquals("hello world", output);
         Assert.assertTrue(signed.verify(cert));
-        Assert.assertEquals("hello world", output);*/
+        Assert.assertEquals("hello world", output);
     }
 
     @Test
     public void testEncryptedInput() throws Exception {
-
         EnvelopedOutput output = new EnvelopedOutput("input", "text/plain");
         output.setCertificate(cert);
-        ClientResponse res = resource()
-                .path("/smime/encrypted")
-                .accept("*/*")
-                .post(ClientResponse.class, output);
+
+        Response res = target("/smime/encrypted").request()
+                .post(Entity.entity(output, MediaType.WILDCARD));
         Assert.assertEquals(204, res.getStatus());
     }
 
@@ -194,10 +220,9 @@ public class IntegrationTest extends JerseyTest {
         signed.setCertificate(cert);
         EnvelopedOutput output = new EnvelopedOutput(signed, "multipart/signed");
         output.setCertificate(cert);
-        ClientResponse res = resource()
-                .path("/smime/encrypted/signed")
+        Response res = target("/smime/encrypted/signed").request()
                 .accept("*/*")
-                .post(ClientResponse.class, output);
+                .post(Entity.entity(output, MediaType.WILDCARD_TYPE));
         Assert.assertEquals(204, res.getStatus());
     }
 
@@ -206,10 +231,9 @@ public class IntegrationTest extends JerseyTest {
         SignedOutput output = new SignedOutput("input", "text/plain");
         output.setCertificate(cert);
         output.setPrivateKey(privateKey);
-        ClientResponse res = resource()
-                .path("/smime/signed")
+        Response res = target("/smime/signed").request()
                 .accept("*/*")
-                .post(ClientResponse.class, output);
+                .post(Entity.entity(output, MediaType.WILDCARD_TYPE));
         Assert.assertEquals(204, res.getStatus());
     }
 }

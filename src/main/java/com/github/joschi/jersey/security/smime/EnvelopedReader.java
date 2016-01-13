@@ -64,7 +64,7 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
         if (headers.containsKey("Content-Type")) {
             headerString.append("Content-Type: ").append(headers.getFirst("Content-Type")).append(CRLF);
         }
-        if ("base64".equalsIgnoreCase(headers.getFirst("Content-Transfer-Encoding"))) {
+        if (headers.containsKey("Content-Transfer-Encoding")) {
             headerString.append("Content-Transfer-Encoding: ").append(headers.getFirst("Content-Transfer-Encoding")).append(CRLF);
         }
         headerString.append(CRLF);

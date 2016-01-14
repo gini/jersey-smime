@@ -44,12 +44,13 @@ Here's an example of using the `EnvelopedOutput` interface:
 
     // client side
     
+    Client client = ClientBuilder.newClient();
     X509Certificate cert = ...; 
     Customer cust = new Customer();
     cust.setName("Bill");
     EnvelopedOutput output = new EnvelopedOutput(cust, "application/xml");
     output.setCertificate(cert);
-    ClientResponse res = request.body("application/pkcs7-mime", output).post();
+    Response res = client.target("http://localhost:9095/smime/encrypted").request().post(Entity.entity(output, "application/pkcs7-mime"));
 
 An `EnvelopedOutput` instance is created passing in the entity you want to marshal and the media type you want to marshal it into. So in this example, we're taking a Customer class and marshalling it into XML before we encrypt it. Jersey will then encrypt the `EnvelopedOutput` using the BouncyCastle framework's S/MIME integration. The output is a Base64 encoding and would look something like this:
 
@@ -80,8 +81,9 @@ Decrypting an S/MIME encrypted message requires using the `com.github.joschi.jer
 
     // client side
     
-    ClientRequest request = new ClientRequest("http://localhost:9095/smime/encrypted");
-    EnvelopedInput input = request.getTarget(EnvelopedInput.class);
+    Client client = ClientBuilder.newClient();
+    Response response = client.target("http://localhost:9095/smime/encrypted").request().get();
+    EnvelopedInput input = response.readEntity(EnvelopedInput.class);
     Customer cust = (Customer)input.getEntity(Customer.class, privateKey, cert);
 
 Both examples simply call the `getEntity()` method passing in the `PrivateKey` and `X509Certificate` instances requires to decrypt the message. On the server side, a generic is used with `EnvelopedInput` to specify the type to marshal to. On the server side this information is passed as a parameter to `getEntity()`. The message is in MIME format: a `Content-Type` header and body, so the `EnvelopedInput` class now has everything it needs to know to both decrypt and unmarshall the entity.
@@ -110,13 +112,13 @@ Jersey S/MIME has two different interfaces for creating a `multipart/signed` mes
 
     // client side
      
-    ClientRequest request = new ClientRequest("http://localhost:9095/smime/signed");
+    Client client = ClientBuilder.newClient();
     Customer cust = new Customer();
     cust.setName("Bill");
     SignedOutput output = new SignedOutput(cust, "application/xml");
     output.setPrivateKey(privateKey);
     output.setCertificate(cert);
-    ClientResponse res = request.body("multipart/signed", output).post();
+    Response res = client.target("http://localhost:9095/smime/signed").request().post(Entity.entity(output, "multipart/signed"));
 
 
 An `SignedOutput` instance is created passing in the entity you want to marshal and the media type you want to marshal it into. So in this example, we're taking a `Customer` class and marshalling it into XML before we sign it. Jersey will then sign the `SignedOutput` using the BouncyCastle framework's S/MIME integration. The output would look something like this:
@@ -161,16 +163,30 @@ To unmarshal and verify a signed message requires using the `com.github.joschi.j
 
     // client side
     
-    ClientRequest request = new ClientRequest("http://localhost:9095/smime/signed");
-    SignedInput input = request.getTarget(SignedInput.class);
+    Client client = ClientBuilder.newClient();
+    Response response = client.target("http://localhost:9095/smime/signed").request().get();
+    SignedInput input = response.readEntity(SignedInput.class);
     Customer cust = (Customer)input.getEntity(Customer.class)
     input.verify(cert);
+
+## Testing ##
+
+## Warning ##
+
+Be aware of using other than default Connector implementation. There is an issue handling HTTP headers in WriterInterceptor or MessageBodyWriter<T>. If you need to change header fields do not use nor ApacheConnectorProvider nor GrizzlyConnectorProvider neither JettyConnectorProvider. 
+On the other hand, in the default transport connector, there are some restrictions on the headers, that can be sent in the default configuration.
+Since the S/MIME protocol depends on the `Content-Transfer-Encoding` header, the restrictions have to be disabled:
+    
+    System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+
+See https://jersey.java.net/nonav/documentation/2.22.1/user-guide.html#d0e4957 for more information on these limitations.
 
 
 Contributors
 ------------
 
 * Raffael Stein (@mrmaloke)
+* Nico v. Hoyningen-Huene (@nicolone)
 
 
 License

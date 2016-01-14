@@ -1,7 +1,8 @@
 package com.github.joschi.jersey.security.smime;
 
 import com.github.joschi.jersey.security.PemUtils;
-import com.sun.jersey.core.util.Base64;
+import com.github.joschi.jersey.util.Base64;
+import org.apache.commons.codec.net.QuotedPrintableCodec;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
 import org.bouncycastle.cms.CMSException;
@@ -35,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.SequenceInputStream;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -96,7 +96,7 @@ public class EnvelopedTest {
         _msg.writeTo(encrypted);
         encrypted.close();
 
-        byte[] base64 = Base64.encode(os.toByteArray());
+        byte[] base64 = Base64.encodeBytesToBytes(os.toByteArray());
 
         ih = new InternetHeaders();
         ih.addHeader("Content-Disposition", "attachment; filename=\"smime.p7m\"");
@@ -162,6 +162,48 @@ public class EnvelopedTest {
         ih.addHeader("Content-Type", "application/pkcs7-mime; smime-type=enveloped-data; name=\"smime.p7m\"");
         ih.addHeader("Content-Transfer-Encoding", "base64");
         MimeBodyPart mp = new MimeBodyPart(ih, python_smime.getBytes());
+
+        output(mp);
+        System.out.println("------------");
+        mp = decode2Mime(mp);
+
+        Assert.assertEquals("application/xml", mp.getContentType());
+
+        String body = toString(mp.getInputStream());
+        Assert.assertEquals("<customer name=\"bill\"/>", body.trim());
+
+
+    }
+
+    @Test
+    public void testQuotedPrintableEncoding() throws Exception {
+        OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(CMSAlgorithm.DES_EDE3_CBC)
+                                        .setProvider("BC")
+                                        .build();
+        JceKeyTransRecipientInfoGenerator infoGenerator = new JceKeyTransRecipientInfoGenerator(cert);
+        CMSEnvelopedDataStreamGenerator generator = new CMSEnvelopedDataStreamGenerator();
+        generator.addRecipientInfoGenerator(infoGenerator);
+
+
+        InternetHeaders ih = new InternetHeaders();
+        ih.addHeader("Content-Type", "application/xml");
+
+        MimeBodyPart _msg = new MimeBodyPart(ih, "<customer name=\"bill\"/>".getBytes());
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        OutputStream encrypted = generator.open(os, encryptor);
+
+        _msg.writeTo(encrypted);
+        encrypted.close();
+
+        QuotedPrintableCodec qpEncoder = new QuotedPrintableCodec();
+        final byte[] qpEncoded = qpEncoder.encode(os.toByteArray());
+
+        ih = new InternetHeaders();
+        ih.addHeader("Content-Disposition", "attachment; filename=\"smime.p7m\"");
+        ih.addHeader("Content-Type", "application/pkcs7-mime; smime-type=enveloped-data; name=\"smime.p7m\"");
+        ih.addHeader("Content-Transfer-Encoding", "quoted-printable");
+        MimeBodyPart mp = new MimeBodyPart(ih, qpEncoded);
 
         output(mp);
         System.out.println("------------");

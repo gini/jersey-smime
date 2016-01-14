@@ -37,11 +37,14 @@ public class EnvelopedReader implements MessageBodyReader<EnvelopedInput> {
     @Context
     private Providers providers;
 
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return EnvelopedInput.class.isAssignableFrom(type);
     }
 
-    public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException, WebApplicationException {
+    @Override
+    public EnvelopedInput readFrom(Class<EnvelopedInput> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws
+                                    IOException, WebApplicationException {
         Class<?> baseType = null;
         Type baseGenericType = null;
 

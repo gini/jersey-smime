@@ -1,9 +1,15 @@
 language: java
 install: mvn install site -Dgpg.skip=true
+#  Workaround for Buffer overflow in openjdk7 see https://github.com/travis-ci/travis-ci/issues/5227
+before_install:
+  - cat /etc/hosts # optionally check the content *before*
+  - sudo hostname "$(hostname | cut -c1-63)"
+  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
+  - cat /etc/hosts # optionally check the content *after*
+
 after_success:
   - mvn jacoco:report coveralls:jacoco
 jdk:
   - openjdk7
-  - openjdk6
   - oraclejdk7
   - oraclejdk8

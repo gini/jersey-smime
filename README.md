@@ -5,7 +5,7 @@
 
 Jersey S/MIME is a port of the S/MIME functionality in `resteasy-security` to the Jersey framework.
 
-S/MIME (Secure/Multipurpose Internet Mail Extensions) is a standard for public key encryption and signing of MIME data. MIME data being a set of headers and a message body. It's most often seen in the email world when somebody wants to encrypt and/or sign an email message they are sending across the internet. It can also be used for HTTP requests as well which is what the Jersey integration with S/MIME is all about. Jersey S/MIME allows you to easily encrypt and/or sign an email message using the S/MIME standard.
+S/MIME (Secure/Multipurpose Internet Mail Extensions) is a standard for public key encryption and signing of MIME data. MIME data being a set of headers and a message body. It's most often seen in the email world when somebody wants to encrypt and/or sign an email message they are sending across the Internet. It can also be used for HTTP requests as well which is what the Jersey integration with S/MIME is all about. Jersey S/MIME allows you to easily encrypt and/or sign an email message using the S/MIME standard.
 
 
 ## Maven Artifacts ##
@@ -185,8 +185,10 @@ See https://jersey.java.net/nonav/documentation/2.22.1/user-guide.html#d0e4957 f
 Contributors
 ------------
 
-* Raffael Stein (@mrmaloke)
-* Nico v. Hoyningen-Huene (@nicolone)
+* [Raffael Stein](https://github.com/rafaroca)
+* [Nico v. Hoyningen-Huene](https://github.com/nicolone)
+
+If your name is missing, please let us know.
 
 
 License

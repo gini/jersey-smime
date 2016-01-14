@@ -5,12 +5,6 @@
         <maven>3.0.0</maven>
     </prerequisites>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
     <groupId>net.gini</groupId>
     <artifactId>jersey-smime</artifactId>
     <version>0.2.2-SNAPSHOT</version>
@@ -62,6 +56,14 @@
     </contributors>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
         <site>
             <id>jersey-smime-site</id>
             <url>http://gini.github.io/jersey-smime/${project.version}</url>

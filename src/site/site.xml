@@ -16,6 +16,10 @@
         </fluidoSkin>
     </custom>
     <body>
+        <menu name="Overview">
+            <item name="Readme" href="README.html" />
+            <item name="Changelog" href="CHANGELOG.html" />
+        </menu>
         <menu ref="modules"/>
         <menu ref="reports"/>
     </body>

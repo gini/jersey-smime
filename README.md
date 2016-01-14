@@ -173,7 +173,7 @@ To unmarshal and verify a signed message requires using the `net.gini.jersey.sec
 
 ## Warning ##
 
-Be aware of using other than default Connector implementation. There is an issue handling HTTP headers in WriterInterceptor or MessageBodyWriter<T>. If you need to change header fields do not use nor ApacheConnectorProvider nor GrizzlyConnectorProvider neither JettyConnectorProvider. 
+Be aware of using other than default Connector implementation. There is an issue handling HTTP headers in ``WriterInterceptor` or `MessageBodyWriter<T>`. If you need to change header fields do not use nor ApacheConnectorProvider nor GrizzlyConnectorProvider neither JettyConnectorProvider.
 On the other hand, in the default transport connector, there are some restrictions on the headers, that can be sent in the default configuration.
 Since the S/MIME protocol depends on the `Content-Transfer-Encoding` header, the restrictions have to be disabled:
     

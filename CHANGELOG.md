@@ -1,5 +1,5 @@
-jersey-smime Changelog
-======================
+Jersey S/MIME Changelog
+=======================
 
 0.3.0
 -----
@@ -10,5 +10,6 @@ jersey-smime Changelog
 * Group ID changed to `net.gini`
 
 The project's new home is now
-[gini/jersey-smime](https://github.com/gini/jersey-smime). We like to thank
-[\@joschi](https://github.com/joschi) for all the work he put into this project.
+[gini/jersey-smime](https://github.com/gini/jersey-smime). We would like to
+thank [@joschi](https://github.com/joschi) for all the work he put into this
+project.

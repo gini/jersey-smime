@@ -246,6 +246,14 @@
                 <configuration>
                     <skipDeploy>true</skipDeploy>
                 </configuration>
+                <dependencies>
+                    <!-- Markdown support -->
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>1.6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>com.github.github</groupId>

@@ -103,7 +103,7 @@ public class IntegrationTest extends JerseyTest {
     @Override
     protected Application configure() {
         final ResourceConfig config = new ResourceConfig();
-        config.packages("com.github.joschi.jersey.security.smime");
+        config.packages(EnvelopedWriter.class.getPackage().getName());
         config.register(EnvelopedWriter.class);
         config.register(SignedWriter.class);
         config.register(EnvelopedReader.class);

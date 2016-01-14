@@ -15,7 +15,7 @@ You must include the jersey-crypto project to use the S/MIME framework.
     <dependency>
         <groupId>net.gini</groupId>
         <artifactId>jersey-smime</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>0.3.0</version>
     </dependency>
 
 

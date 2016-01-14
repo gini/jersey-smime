@@ -1,4 +1,4 @@
-com.github.joschi.jersey.security.smime.EnvelopedReader
-com.github.joschi.jersey.security.smime.EnvelopedWriter
-com.github.joschi.jersey.security.smime.SignedReader
-com.github.joschi.jersey.security.smime.SignedWriter
+net.gini.jersey.security.smime.EnvelopedReader
+net.gini.jersey.security.smime.EnvelopedWriter
+net.gini.jersey.security.smime.SignedReader
+net.gini.jersey.security.smime.SignedWriter

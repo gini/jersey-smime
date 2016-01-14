@@ -1,7 +1,7 @@
 # Jersey S/MIME #
 
-[![Build Status](https://secure.travis-ci.org/joschi/jersey-smime.png?branch=master)](https://travis-ci.org/joschi/jersey-smime)
-[![Coverage Status](https://img.shields.io/coveralls/joschi/jersey-smime.svg)](https://coveralls.io/r/joschi/jersey-smime)
+[![Build Status](https://secure.travis-ci.org/gini/jersey-smime.png?branch=master)](https://travis-ci.org/gini/jersey-smime)
+[![Coverage Status](https://img.shields.io/coveralls/gini/jersey-smime.svg)](https://coveralls.io/r/gini/jersey-smime)
 
 Jersey S/MIME is a port of the S/MIME functionality in `resteasy-security` to the Jersey framework.
 
@@ -13,7 +13,7 @@ S/MIME (Secure/Multipurpose Internet Mail Extensions) is a standard for public k
 You must include the jersey-crypto project to use the S/MIME framework.
 
     <dependency>
-        <groupId>com.github.joschi</groupId>
+        <groupId>net.gini</groupId>
         <artifactId>jersey-smime</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </dependency>

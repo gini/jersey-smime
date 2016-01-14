@@ -11,7 +11,7 @@
         <version>7</version>
     </parent>
 
-    <groupId>com.github.joschi</groupId>
+    <groupId>net.gini</groupId>
     <artifactId>jersey-smime</artifactId>
     <version>0.2.2-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -20,7 +20,7 @@
     <description>
         Backport of the S/MIME features from resteasy-security
     </description>
-    <url>https://github.com/joschi/jersey-smime</url>
+    <url>https://github.com/gini/jersey-smime</url>
 
     <licenses>
         <license>
@@ -31,18 +31,18 @@
     </licenses>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:joschi/jersey-smime.git</developerConnection>
-        <connection>scm:git:github.com/joschi/jersey-smime.git</connection>
-        <url>https://github.com/joschi/jersey-smime</url>
+        <developerConnection>scm:git:git@github.com:gini/jersey-smime.git</developerConnection>
+        <connection>scm:git:github.com/gini/jersey-smime.git</connection>
+        <url>https://github.com/gini/jersey-smime</url>
     </scm>
 
     <ciManagement>
         <system>Travis CI</system>
-        <url>https://travis-ci.org/joschi/jersey-smime</url>
+        <url>https://travis-ci.org/gini/jersey-smime</url>
     </ciManagement>
 
     <issueManagement>
-        <url>https://github.com/joschi/jersey-smime/issues</url>
+        <url>https://github.com/gini/jersey-smime/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -64,7 +64,7 @@
     <distributionManagement>
         <site>
             <id>jersey-smime-site</id>
-            <url>http://joschi.github.io/jersey-smime/${project.version}</url>
+            <url>http://gini.github.io/jersey-smime/${project.version}</url>
         </site>
     </distributionManagement>
 
